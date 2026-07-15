@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:FileManager.Models"
+             x:Class="FileManager.Pages.MainPage"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- ============ Barra superior ============ -->
+        <VerticalStackLayout Grid.Row="0" BackgroundColor="{StaticResource Primary}" Spacing="0">
+
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" Padding="8,6" ColumnSpacing="2">
+
+                <Button x:Name="UpButton"
+                        Grid.Column="0"
+                        Text="←"
+                        FontSize="22"
+                        Style="{StaticResource HeaderIconButton}"
+                        IsVisible="False"
+                        Clicked="OnUpClicked" />
+
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Padding="8,0" Spacing="0">
+                    <Label x:Name="TitleLabel"
+                           FontSize="19"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource White}"
+                           LineBreakMode="TailTruncation" />
+                    <Label x:Name="SubtitleLabel"
+                           FontSize="12"
+                           TextColor="#CFE0F0"
+                           LineBreakMode="TailTruncation" />
+                </VerticalStackLayout>
+
+                <Button x:Name="SearchButton"
+                        Grid.Column="2"
+                        Text="🔍"
+                        Style="{StaticResource HeaderIconButton}"
+                        Clicked="OnSearchToggleClicked" />
+
+                <Button x:Name="MoreButton"
+                        Grid.Column="3"
+                        Text="⋮"
+                        FontSize="22"
+                        Style="{StaticResource HeaderIconButton}"
+                        Clicked="OnMoreClicked" />
+            </Grid>
+
+            <!-- Busqueda (oculta hasta que se pulsa la lupa) -->
+            <SearchBar x:Name="FileSearchBar"
+                       IsVisible="False"
+                       Margin="12,0,12,8"
+                       BackgroundColor="{StaticResource White}"
+                       TextColor="{StaticResource TextPrimaryLight}"
+                       PlaceholderColor="{StaticResource TextSecondaryLight}"
+                       CancelButtonColor="{StaticResource Primary}"
+                       TextChanged="OnSearchTextChanged" />
+
+            <!-- Ruta de navegacion -->
+            <ScrollView x:Name="BreadcrumbScroll"
+                        Orientation="Horizontal"
+                        HorizontalScrollBarVisibility="Never"
+                        Padding="12,0,12,10">
+                <HorizontalStackLayout x:Name="BreadcrumbBar" Spacing="2" />
+            </ScrollView>
+
+        </VerticalStackLayout>
+
+        <!-- ============ Contenido ============ -->
+        <Grid Grid.Row="1">
+
+            <CollectionView x:Name="FilesView"
+                            SelectionMode="None"
+                            Margin="0,4,0,0">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:FileItem">
+                        <Grid Padding="12,4">
+                            <Border Style="{StaticResource Card}">
+                                <Grid ColumnDefinitions="Auto,*,Auto"
+                                      Padding="10,8"
+                                      ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnItemTapped" />
+                                    </Grid.GestureRecognizers>
+
+                                    <Border Grid.Column="0"
+                                            WidthRequest="44"
+                                            HeightRequest="44"
+                                            StrokeThickness="0"
+                                            VerticalOptions="Center"
+                                            BackgroundColor="{AppThemeBinding Light=#EDF3F9, Dark=#252D36}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="22" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding Icon}"
+                                               FontSize="21"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Name}"
+                                               FontSize="15"
+                                               LineBreakMode="MiddleTruncation"
+                                               MaxLines="1"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                                        <Label Text="{Binding Details}"
+                                               Style="{StaticResource HintText}"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1" />
+                                    </VerticalStackLayout>
+
+                                    <Button Grid.Column="2"
+                                            Text="⋮"
+                                            FontSize="20"
+                                            WidthRequest="40"
+                                            HeightRequest="40"
+                                            Padding="0"
+                                            CornerRadius="20"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                                            Clicked="OnItemMenuClicked" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Carpeta vacia / sin resultados -->
+            <VerticalStackLayout x:Name="EmptyView"
+                                 IsVisible="False"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 Padding="40"
+                                 Spacing="10">
+                <Label x:Name="EmptyIconLabel" Text="📂" FontSize="56" HorizontalOptions="Center" Opacity="0.5" />
+                <Label x:Name="EmptyTitleLabel"
+                       FontSize="16"
+                       HorizontalTextAlignment="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                <Label x:Name="EmptyHintLabel"
+                       Style="{StaticResource HintText}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- Puerta de permisos: sin acceso no hay nada que listar -->
+            <ScrollView x:Name="PermissionView" IsVisible="False">
+                <VerticalStackLayout Padding="24" Spacing="16" VerticalOptions="Center">
+                    <Label Text="🔒" FontSize="56" HorizontalOptions="Center" />
+                    <Label x:Name="PermissionTitleLabel"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                    <Label x:Name="PermissionBodyLabel"
+                           Style="{StaticResource BodyText}"
+                           LineHeight="1.4"
+                           HorizontalTextAlignment="Center" />
+                    <Button x:Name="PermissionButton"
+                            Style="{StaticResource PrimaryButton}"
+                            Clicked="OnRequestPermissionClicked" />
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <ActivityIndicator x:Name="Busy"
+                               IsRunning="False"
+                               IsVisible="False"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center" />
+
+            <!-- Boton flotante: nueva carpeta -->
+            <Button x:Name="NewFolderButton"
+                    Text="+"
+                    FontSize="28"
+                    FontAttributes="Bold"
+                    WidthRequest="58"
+                    HeightRequest="58"
+                    CornerRadius="29"
+                    Padding="0"
+                    Margin="0,0,18,18"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="{StaticResource White}"
+                    HorizontalOptions="End"
+                    VerticalOptions="End"
+                    Clicked="OnNewFolderClicked">
+                <Button.Shadow>
+                    <Shadow Brush="{StaticResource Black}" Opacity="0.3" Radius="10" Offset="0,4" />
+                </Button.Shadow>
+            </Button>
+
+            <!-- Barra de pegado: solo visible con el portapapeles lleno -->
+            <Border x:Name="PasteBar"
+                    IsVisible="False"
+                    VerticalOptions="End"
+                    Margin="12"
+                    Padding="14,10"
+                    BackgroundColor="{StaticResource PrimaryDark}"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                    <Label x:Name="PasteLabel"
+                           Grid.Column="0"
+                           VerticalOptions="Center"
+                           FontSize="14"
+                           TextColor="{StaticResource White}"
+                           LineBreakMode="TailTruncation" />
+                    <Button x:Name="PasteCancelButton"
+                            Grid.Column="1"
+                            BackgroundColor="Transparent"
+                            TextColor="#CFE0F0"
+                            FontSize="14"
+                            HeightRequest="40"
+                            Clicked="OnCancelPasteClicked" />
+                    <Button x:Name="PasteConfirmButton"
+                            Grid.Column="2"
+                            BackgroundColor="{StaticResource White}"
+                            TextColor="{StaticResource PrimaryDark}"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="40"
+                            Clicked="OnPasteClicked" />
+                </Grid>
+            </Border>
+
+        </Grid>
+    </Grid>
+
+</ContentPage>

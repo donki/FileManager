@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Icono de la aplicacion: carpeta abierta con un documento, tematica del gestor de ficheros. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="456" height="456" viewBox="0 0 456 456">
+
+  <!-- Panel trasero de la carpeta con la pestana -->
+  <path d="M96 160 a20 20 0 0 1 20-20 h66 a20 20 0 0 1 14.1 5.9 l20 20 H340 a20 20 0 0 1 20 20 v14 H96 Z"
+        fill="#FFFFFF" opacity="0.55" />
+
+  <!-- Documento que asoma por encima -->
+  <g>
+    <path d="M196 134 h46 l26 26 v46 h-72 Z" fill="#FDBA74" />
+    <path d="M242 134 l26 26 h-26 Z" fill="#E67E22" />
+    <rect x="210" y="160" width="44" height="6" rx="3" fill="#E67E22" opacity="0.75" />
+    <rect x="210" y="176" width="44" height="6" rx="3" fill="#E67E22" opacity="0.75" />
+  </g>
+
+  <!-- Panel frontal de la carpeta -->
+  <path d="M96 194 h264 v124 a20 20 0 0 1 -20 20 H116 a20 20 0 0 1 -20 -20 Z"
+        fill="#FFFFFF" />
+
+</svg>

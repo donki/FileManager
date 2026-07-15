@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FileManager.Pages.SettingsPage">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <!-- Idioma -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="20,16" Spacing="12">
+                    <Label x:Name="LanguageTitle" Text="🌐" Style="{StaticResource CardTitle}" />
+
+                    <Picker x:Name="LanguagePicker"
+                            FontSize="15"
+                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                            SelectedIndexChanged="OnLanguageChanged" />
+
+                    <Label x:Name="LanguageHint" Style="{StaticResource HintText}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Visualizacion -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="20,16" Spacing="14">
+                    <Label x:Name="DisplayTitle" Style="{StaticResource CardTitle}" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label x:Name="ShowHiddenLabel" Style="{StaticResource BodyText}" />
+                            <Label x:Name="ShowHiddenHint" Style="{StaticResource HintText}" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="ShowHiddenSwitch"
+                                Grid.Column="1"
+                                VerticalOptions="Center"
+                                OnColor="{StaticResource PrimaryLight}"
+                                ThumbColor="{StaticResource Primary}"
+                                Toggled="OnShowHiddenToggled" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1"
+                             Color="{AppThemeBinding Light={StaticResource SeparatorLight}, Dark={StaticResource SeparatorDark}}" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label x:Name="ConfirmDeleteLabel" Style="{StaticResource BodyText}" />
+                            <Label x:Name="ConfirmDeleteHint" Style="{StaticResource HintText}" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="ConfirmDeleteSwitch"
+                                Grid.Column="1"
+                                VerticalOptions="Center"
+                                OnColor="{StaticResource PrimaryLight}"
+                                ThumbColor="{StaticResource Primary}"
+                                Toggled="OnConfirmDeleteToggled" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Almacenamiento -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="20,16" Spacing="12">
+                    <Label x:Name="StorageTitle" Style="{StaticResource CardTitle}" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Label x:Name="PermissionStateLabel"
+                               Grid.Column="0"
+                               Style="{StaticResource BodyText}"
+                               VerticalOptions="Center" />
+                        <Label x:Name="PermissionStateValue"
+                               Grid.Column="1"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                    </Grid>
+
+                    <Button x:Name="PermissionButton"
+                            Style="{StaticResource OutlineButton}"
+                            Clicked="OnPermissionClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Button x:Name="AboutButton"
+                    Style="{StaticResource PrimaryButton}"
+                    Clicked="OnAboutClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

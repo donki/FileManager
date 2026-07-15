@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Version del icono para la pagina Acerca de: sobre fondo claro, en el azul de la marca. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="456" height="456" viewBox="0 0 456 456">
+
+  <path d="M96 160 a20 20 0 0 1 20-20 h66 a20 20 0 0 1 14.1 5.9 l20 20 H340 a20 20 0 0 1 20 20 v14 H96 Z"
+        fill="#4A87C4" />
+
+  <g>
+    <path d="M196 134 h46 l26 26 v46 h-72 Z" fill="#F5B267" />
+    <path d="M242 134 l26 26 h-26 Z" fill="#E67E22" />
+    <rect x="210" y="160" width="44" height="6" rx="3" fill="#FFFFFF" opacity="0.85" />
+    <rect x="210" y="176" width="44" height="6" rx="3" fill="#FFFFFF" opacity="0.85" />
+  </g>
+
+  <path d="M96 194 h264 v124 a20 20 0 0 1 -20 20 H116 a20 20 0 0 1 -20 -20 Z"
+        fill="#1E5C97" />
+
+</svg>

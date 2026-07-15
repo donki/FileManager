@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+
+  <application android:allowBackup="true"
+               android:icon="@mipmap/appicon"
+               android:roundIcon="@mipmap/appicon_round"
+               android:supportsRtl="true"
+               android:requestLegacyExternalStorage="true" />
+
+  <!--
+    Permisos (constitucion 5: justificar cada permiso).
+
+    MANAGE_EXTERNAL_STORAGE: la funcion principal de la aplicacion es gestionar los ficheros
+    del dispositivo (explorar, copiar, mover, renombrar, eliminar). Es el caso de uso que
+    Google Play admite explicitamente para este permiso y requiere declaracion en Play Console.
+  -->
+  <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+  <!-- Android 10 (API 29) y anteriores: MANAGE_EXTERNAL_STORAGE no existe todavia. -->
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+                   android:maxSdkVersion="29" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+                   android:maxSdkVersion="29" />
+
+  <!-- Consultar que aplicacion puede abrir o compartir cada fichero (Android 11+). -->
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <data android:mimeType="*/*" />
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.SEND" />
+      <data android:mimeType="*/*" />
+    </intent>
+    <!-- Boton de contacto de la pagina Acerca de. -->
+    <intent>
+      <action android:name="android.intent.action.SENDTO" />
+      <data android:scheme="mailto" />
+    </intent>
+  </queries>
+
+</manifest>

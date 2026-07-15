@@ -1,0 +1,35 @@
+## Compilación
+bin/
+obj/
+artifacts/
+[Rr]elease/
+*.user
+*.lscache
+*.Backup.tmp
+
+## Visual Studio / VS Code
+.vs/
+.idea/
+*.suo
+*.userprefs
+
+## Secretos: nunca deben subirse al repositorio (constitución §5)
+*.keystore
+*.jks
+keystore.password.txt
+*-service-account.json
+google-play-*.json
+*.pem
+
+## Artefactos Android
+*.apk
+*.aab
+*.idsig
+
+## Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Documentacion interna de trabajo (no se publica)
+Transversaral Req.md
