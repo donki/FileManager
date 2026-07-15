@@ -28,6 +28,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
   ventana desde otra Activity. Ahora se reevalúa también en el evento `Resumed` de la ventana.
   Detectado al validar en MuMu el flujo real del permiso.
 
+### Gobernanza
+- Incorporada la constitución como submódulo de solo lectura en `constitution/`, anclado al commit
+  `160c54c` de [donki/constitution](https://github.com/donki/constitution) (constitución §23).
+  Antes de publicar hay que comprobar si el anclaje sigue al día (§17).
+
 ### Notas técnicas
 - Permiso `MANAGE_EXTERNAL_STORAGE` con pantalla de solicitud propia; requiere declaración
   en Play Console. Justificación en el README.
