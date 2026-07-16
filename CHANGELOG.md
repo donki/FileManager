@@ -4,6 +4,32 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.07.16.1] — 2026-07-16
+
+`versionCode`: 202607161
+
+### Añadido
+- `Resources/AppIcon/play_store_icon.png`: icono de ficha de Play Console de 512×512, opaco,
+  compuesto por `appicon.svg` (fondo `#1E5C97`) y `appiconfg.svg` (carpeta con documento). El icono
+  de launcher que genera MAUI dentro del AAB no lo usa Play Console como icono de tienda: es un
+  asset aparte de la ficha.
+
+### Cambiado
+- Versión y `versionCode` incrementados para poder subir un AAB nuevo: Play Console ya tenía
+  202607160 y no admite reutilizar un `versionCode`. Sin cambios funcionales respecto a
+  2026.07.16.0.
+
+## [2026.07.16.0] — 2026-07-16
+
+`versionCode`: 202607160
+
+Versión preparada para el primer envío a Play Console. Sin cambios funcionales respecto a
+2026.07.15.0: solo se fija la versión a la fecha de publicación (§A.4). Absorbe el
+`2026.07.15.1` que llegó a estar en el `csproj` sin entrada propia en este fichero.
+
+### Cambiado
+- Versión y `versionCode` fijados a la fecha de publicación.
+
 ## [2026.07.15.0] — 2026-07-15
 
 `versionCode`: 202607150

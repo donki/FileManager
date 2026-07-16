@@ -21,6 +21,14 @@ keystore.password.txt
 google-play-*.json
 *.pem
 
+# Cuenta de servicio de Google Play: el fichero que descarga Google Cloud se llama
+# <proyecto>-<id>.json, que ningún patrón anterior cubre.
+hiker-*.json
+
+# Salida de PEPK: contiene la clave de firma de app cifrada.
+firmapara*.zip
+*.pepk
+
 ## Artefactos Android
 *.apk
 *.aab

@@ -16,8 +16,8 @@
     <ApplicationId>com.socratic.filemanager</ApplicationId>
 
     <!-- Versions (constitucion 6: ambos valores en sincronia) -->
-    <ApplicationDisplayVersion>2026.07.15.0</ApplicationDisplayVersion>
-    <ApplicationVersion>202607150</ApplicationVersion>
+    <ApplicationDisplayVersion>2026.07.16.1</ApplicationDisplayVersion>
+    <ApplicationVersion>202607161</ApplicationVersion>
 
     <!-- Accept Android SDK Licenses -->
     <AcceptAndroidSDKLicenses>true</AcceptAndroidSDKLicenses>
@@ -44,8 +44,8 @@
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
     <UseInterpreter>false</UseInterpreter>
 
-    <AssemblyVersion>2026.07.15.0</AssemblyVersion>
-    <FileVersion>2026.07.15.0</FileVersion>
+    <AssemblyVersion>2026.07.16.1</AssemblyVersion>
+    <FileVersion>2026.07.16.1</FileVersion>
   </PropertyGroup>
 
   <!-- Release configuration for Android -->
