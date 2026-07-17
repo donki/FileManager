@@ -6,8 +6,8 @@ namespace FileManager.Pages;
 public partial class AboutPage : ContentPage
 {
     // CONFIGURACION
-    private const string ContactEmail = "jsola@ipssoft.com";
-    private const string DonationUrl = "https://ko-fi.com/socratic";
+    private const string ContactEmail = "jsoladelarosa@gmail.com";
+    private const string DonationUrl = "https://ko-fi.com/josepsola";
 
     private readonly ILocalizationService _l;
     private readonly ILogger<AboutPage> _logger;
