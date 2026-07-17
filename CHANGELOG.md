@@ -4,6 +4,20 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.07.17.0] — 2026-07-17
+
+`versionCode`: 202607170
+
+### Cambiado
+- El botón de búsqueda de la barra superior usa un icono **flat de contorno** (`ic_search.svg`,
+  trazo blanco sin relleno) en lugar del emoji 🔍, que la fuente del sistema dibujaba relleno y
+  multicolor. Es el estilo de iconografía que fija la constitución (anexo A.9): iconos de acción
+  vectoriales y de contorno, nunca emoji. El botón pasa de `Button` con `Text` a `ImageButton`.
+
+### Gobernanza
+- Submódulo `constitution` actualizado a `95e2b59` (constitución §23): incorpora la **sección 24
+  (Sistema de Diseño Visual)** y el **anexo A.9**, con la directriz de iconografía flat de contorno.
+
 ## [2026.07.16.1] — 2026-07-16
 
 `versionCode`: 202607161

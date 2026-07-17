@@ -32,11 +32,16 @@
                            LineBreakMode="TailTruncation" />
                 </VerticalStackLayout>
 
-                <Button x:Name="SearchButton"
-                        Grid.Column="2"
-                        Text="🔍"
-                        Style="{StaticResource HeaderIconButton}"
-                        Clicked="OnSearchToggleClicked" />
+                <ImageButton x:Name="SearchButton"
+                             Grid.Column="2"
+                             Source="ic_search.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             Clicked="OnSearchToggleClicked" />
 
                 <Button x:Name="MoreButton"
                         Grid.Column="3"
