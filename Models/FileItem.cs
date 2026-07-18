@@ -18,8 +18,8 @@ public class FileItem
 
     public bool IsHidden { get; init; }
 
-    /// <summary>Icono mostrado en la lista, asignado segun el tipo de contenido.</summary>
-    public string Icon { get; set; } = "📄";
+    /// <summary>Nombre del recurso de icono (PNG vectorial) mostrado en la lista, asignado segun el tipo de contenido.</summary>
+    public string Icon { get; set; } = "ic_file_generic.png";
 
     /// <summary>Linea secundaria de la fila (fecha y tamano ya formateados y localizados).</summary>
     public string Details { get; set; } = string.Empty;

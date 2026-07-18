@@ -6,9 +6,6 @@ namespace FileManager.Pages;
 
 public partial class SettingsPage : ContentPage
 {
-    /// <summary>Codigos de idioma en el mismo orden que las opciones del Picker.</summary>
-    private static readonly string[] LanguageCodes = { LocalizationService.SystemLanguage, "en", "es" };
-
     private readonly ISettingsService _settings;
     private readonly ILocalizationService _l;
     private readonly IStoragePermissionService _permissions;
@@ -57,25 +54,27 @@ public partial class SettingsPage : ContentPage
 
         AboutButton.Text = $"ℹ️ {_l["About"]}";
 
-        var index = LanguagePicker.SelectedIndex;
-        LanguagePicker.ItemsSource = new List<string>
-        {
-            _l["SettingsLanguageSystem"],
-            _l["SettingsLanguageEnglish"],
-            _l["SettingsLanguageSpanish"]
-        };
-        // Reasignar ItemsSource borra la seleccion: se restaura la que habia.
-        LanguagePicker.SelectedIndex = index;
+        UpdateLanguageButtons();
     }
+
+    // Botones de idioma con bandera, iguales al resto de apps (constitucion, anexo A.9):
+    // el idioma activo (es/en, los oficiales) usa el estilo primario y el otro el de contorno.
+    private void UpdateLanguageButtons()
+    {
+        var isSpanish = _l.CurrentLanguage == "es";
+        SpanishButton.Style = LookupStyle(isSpanish ? "PrimaryButton" : "OutlineButton");
+        EnglishButton.Style = LookupStyle(isSpanish ? "OutlineButton" : "PrimaryButton");
+    }
+
+    private static Style? LookupStyle(string key)
+        => Application.Current?.Resources.TryGetValue(key, out var s) == true ? s as Style : null;
 
     private void LoadValues()
     {
         _loading = true;
         try
         {
-            var stored = _settings.Language;
-            var index = Array.IndexOf(LanguageCodes, stored);
-            LanguagePicker.SelectedIndex = index >= 0 ? index : 0;
+            UpdateLanguageButtons();
 
             ShowHiddenSwitch.IsToggled = _settings.ShowHiddenFiles;
             ConfirmDeleteSwitch.IsToggled = _settings.ConfirmDelete;
@@ -92,12 +91,15 @@ public partial class SettingsPage : ContentPage
         }
     }
 
-    private void OnLanguageChanged(object? sender, EventArgs e)
+    private void OnSpanishClicked(object? sender, EventArgs e) => SetLanguage("es");
+
+    private void OnEnglishClicked(object? sender, EventArgs e) => SetLanguage("en");
+
+    private void SetLanguage(string code)
     {
-        if (_loading || LanguagePicker.SelectedIndex < 0)
+        if (_loading || code == _l.CurrentLanguage)
             return;
 
-        var code = LanguageCodes[LanguagePicker.SelectedIndex];
         _settings.Language = code;
         _l.SetLanguage(code);
 

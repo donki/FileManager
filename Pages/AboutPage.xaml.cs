@@ -10,13 +10,15 @@ public partial class AboutPage : ContentPage
     private const string DonationUrl = "https://ko-fi.com/josepsola";
 
     private readonly ILocalizationService _l;
+    private readonly ISettingsService _settings;
     private readonly ILogger<AboutPage> _logger;
 
-    public AboutPage(ILocalizationService localization, ILogger<AboutPage> logger)
+    public AboutPage(ILocalizationService localization, ISettingsService settings, ILogger<AboutPage> logger)
     {
         InitializeComponent();
 
         _l = localization;
+        _settings = settings;
         _logger = logger;
     }
 
@@ -49,12 +51,42 @@ public partial class AboutPage : ContentPage
         DonationButton.Text = _l["AboutDonationButton"];
         DonationHint.Text = _l["AboutDonationHint"];
 
+        LanguageTitle.Text = $"🌐 {_l["SettingsLanguage"]}";
+        LanguageHint.Text = _l["AboutLanguageHint"];
+        UpdateLanguageButtons();
+
         LegalTitle.Text = $"⚖️ {_l["AboutLegal"]}";
         LegalText1.Text = _l["AboutLegal1"];
         LegalText2.Text = _l["AboutLegal2"];
         WarningText.Text = _l["AboutWarning"];
 
         BackButton.Text = _l["Back"];
+    }
+
+    // Botones de idioma con bandera (constitucion, anexo A.9): el activo (es/en) usa el estilo
+    // primario y el otro el de contorno. La eleccion se persiste igual que en Configuracion.
+    private void UpdateLanguageButtons()
+    {
+        var isSpanish = _l.CurrentLanguage == "es";
+        SpanishButton.Style = LookupStyle(isSpanish ? "PrimaryButton" : "OutlineButton");
+        EnglishButton.Style = LookupStyle(isSpanish ? "OutlineButton" : "PrimaryButton");
+    }
+
+    private static Style? LookupStyle(string key)
+        => Application.Current?.Resources.TryGetValue(key, out var s) == true ? s as Style : null;
+
+    private void OnSpanishClicked(object? sender, EventArgs e) => SetLanguage("es");
+
+    private void OnEnglishClicked(object? sender, EventArgs e) => SetLanguage("en");
+
+    private void SetLanguage(string code)
+    {
+        if (code == _l.CurrentLanguage)
+            return;
+
+        _settings.Language = code;
+        _l.SetLanguage(code);
+        ApplyTexts();
     }
 
     private async void OnBackClicked(object? sender, EventArgs e) => await Navigation.PopAsync();

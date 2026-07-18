@@ -27,4 +27,14 @@
     <Color x:Key="White">#FFFFFF</Color>
     <Color x:Key="Black">#000000</Color>
 
+    <!-- Superficies semanticas derivadas (sin literales hex sueltos en el markup, constitucion 24) -->
+    <!-- Subtitulo y texto secundario sobre la barra azul de la marca -->
+    <Color x:Key="SubtitleOnPrimary">#CFE0F0</Color>
+    <!-- Fondo del circulo que envuelve el icono de cada fichero en la lista -->
+    <Color x:Key="IconTileLight">#EDF3F9</Color>
+    <Color x:Key="IconTileDark">#252D36</Color>
+    <!-- Recuadro de advertencia del aviso legal (rojo muy tenue) -->
+    <Color x:Key="WarningSurfaceLight">#FDF2F2</Color>
+    <Color x:Key="WarningSurfaceDark">#2B1E1E</Color>
+
 </ResourceDictionary>

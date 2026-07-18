@@ -12,13 +12,17 @@
 
             <Grid ColumnDefinitions="Auto,*,Auto,Auto" Padding="8,6" ColumnSpacing="2">
 
-                <Button x:Name="UpButton"
-                        Grid.Column="0"
-                        Text="←"
-                        FontSize="22"
-                        Style="{StaticResource HeaderIconButton}"
-                        IsVisible="False"
-                        Clicked="OnUpClicked" />
+                <ImageButton x:Name="UpButton"
+                             Grid.Column="0"
+                             Source="ic_arrow_back.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             IsVisible="False"
+                             Clicked="OnUpClicked" />
 
                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Padding="8,0" Spacing="0">
                     <Label x:Name="TitleLabel"
@@ -28,7 +32,7 @@
                            LineBreakMode="TailTruncation" />
                     <Label x:Name="SubtitleLabel"
                            FontSize="12"
-                           TextColor="#CFE0F0"
+                           TextColor="{StaticResource SubtitleOnPrimary}"
                            LineBreakMode="TailTruncation" />
                 </VerticalStackLayout>
 
@@ -43,12 +47,16 @@
                              Aspect="AspectFit"
                              Clicked="OnSearchToggleClicked" />
 
-                <Button x:Name="MoreButton"
-                        Grid.Column="3"
-                        Text="⋮"
-                        FontSize="22"
-                        Style="{StaticResource HeaderIconButton}"
-                        Clicked="OnMoreClicked" />
+                <ImageButton x:Name="MoreButton"
+                             Grid.Column="3"
+                             Source="ic_more.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             Clicked="OnMoreClicked" />
             </Grid>
 
             <!-- Busqueda (oculta hasta que se pulsa la lupa) -->
@@ -93,12 +101,14 @@
                                             HeightRequest="44"
                                             StrokeThickness="0"
                                             VerticalOptions="Center"
-                                            BackgroundColor="{AppThemeBinding Light=#EDF3F9, Dark=#252D36}">
+                                            BackgroundColor="{AppThemeBinding Light={StaticResource IconTileLight}, Dark={StaticResource IconTileDark}}">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="22" />
                                         </Border.StrokeShape>
-                                        <Label Text="{Binding Icon}"
-                                               FontSize="21"
+                                        <Image Source="{Binding Icon}"
+                                               WidthRequest="24"
+                                               HeightRequest="24"
+                                               Aspect="AspectFit"
                                                HorizontalOptions="Center"
                                                VerticalOptions="Center" />
                                     </Border>
@@ -175,24 +185,22 @@
                                HorizontalOptions="Center" />
 
             <!-- Boton flotante: nueva carpeta -->
-            <Button x:Name="NewFolderButton"
-                    Text="+"
-                    FontSize="28"
-                    FontAttributes="Bold"
+            <ImageButton x:Name="NewFolderButton"
+                    Source="ic_add.png"
+                    Aspect="AspectFit"
+                    Padding="16"
                     WidthRequest="58"
                     HeightRequest="58"
                     CornerRadius="29"
-                    Padding="0"
                     Margin="0,0,18,18"
                     BackgroundColor="{StaticResource Primary}"
-                    TextColor="{StaticResource White}"
                     HorizontalOptions="End"
                     VerticalOptions="End"
                     Clicked="OnNewFolderClicked">
-                <Button.Shadow>
+                <ImageButton.Shadow>
                     <Shadow Brush="{StaticResource Black}" Opacity="0.3" Radius="10" Offset="0,4" />
-                </Button.Shadow>
-            </Button>
+                </ImageButton.Shadow>
+            </ImageButton>
 
             <!-- Barra de pegado: solo visible con el portapapeles lleno -->
             <Border x:Name="PasteBar"
@@ -215,7 +223,7 @@
                     <Button x:Name="PasteCancelButton"
                             Grid.Column="1"
                             BackgroundColor="Transparent"
-                            TextColor="#CFE0F0"
+                            TextColor="{StaticResource SubtitleOnPrimary}"
                             FontSize="14"
                             HeightRequest="40"
                             Clicked="OnCancelPasteClicked" />

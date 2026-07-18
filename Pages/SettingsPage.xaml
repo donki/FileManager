@@ -9,12 +9,25 @@
             <!-- Idioma -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="20,16" Spacing="12">
-                    <Label x:Name="LanguageTitle" Text="🌐" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="LanguageTitle" Style="{StaticResource CardTitle}" />
 
-                    <Picker x:Name="LanguagePicker"
-                            FontSize="15"
-                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
-                            SelectedIndexChanged="OnLanguageChanged" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0"
+                                x:Name="SpanishButton"
+                                Text="🇪🇸 Español"
+                                FontSize="14"
+                                LineBreakMode="WordWrap"
+                                Padding="10,10"
+                                Clicked="OnSpanishClicked" />
+
+                        <Button Grid.Column="1"
+                                x:Name="EnglishButton"
+                                Text="🇺🇸 English"
+                                FontSize="14"
+                                LineBreakMode="WordWrap"
+                                Padding="10,10"
+                                Clicked="OnEnglishClicked" />
+                    </Grid>
 
                     <Label x:Name="LanguageHint" Style="{StaticResource HintText}" />
                 </VerticalStackLayout>
