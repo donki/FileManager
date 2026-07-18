@@ -42,6 +42,9 @@ public partial class AboutPage : ContentPage
         PrivacyTitle.Text = $"🔒 {_l["AboutPrivacy"]}";
         PrivacyText.Text = _l["AboutPrivacyText"];
 
+        LicenseTitle.Text = $"📄 {_l["AboutLicense"]}";
+        LicenseText.Text = _l["AboutLicenseText"];
+
         DonationTitle.Text = $"☕ {_l["AboutDonation"]}";
         DonationButton.Text = _l["AboutDonationButton"];
         DonationHint.Text = _l["AboutDonationHint"];

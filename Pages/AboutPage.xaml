@@ -83,6 +83,20 @@
                 </VerticalStackLayout>
             </Border>
 
+            <!-- Licencia -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="25,20" Spacing="10">
+                    <Label x:Name="LicenseTitle" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="LicenseText"
+                           Style="{StaticResource BodyText}"
+                           FontSize="13"
+                           LineHeight="1.4" />
+                    <Label Text="MIT License · Copyright © 2026 Socratic"
+                           Style="{StaticResource HintText}"
+                           FontSize="11" />
+                </VerticalStackLayout>
+            </Border>
+
             <!-- Aviso legal -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="25,20" Spacing="12">
