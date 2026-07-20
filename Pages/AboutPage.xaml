@@ -78,7 +78,6 @@
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <Button Grid.Column="0"
                                 x:Name="SpanishButton"
-                                Text="🇪🇸 Español"
                                 FontSize="14"
                                 LineBreakMode="WordWrap"
                                 Padding="10,10"
@@ -86,7 +85,6 @@
 
                         <Button Grid.Column="1"
                                 x:Name="EnglishButton"
-                                Text="🇺🇸 English"
                                 FontSize="14"
                                 LineBreakMode="WordWrap"
                                 Padding="10,10"

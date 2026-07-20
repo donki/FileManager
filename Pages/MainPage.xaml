@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:FileManager.Models"
              x:Class="FileManager.Pages.MainPage"
+             Shell.NavBarIsVisible="False"
              NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="Auto,*">
@@ -10,10 +11,22 @@
         <!-- ============ Barra superior ============ -->
         <VerticalStackLayout Grid.Row="0" BackgroundColor="{StaticResource Primary}" Spacing="0">
 
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto" Padding="8,6" ColumnSpacing="2">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Padding="8,6" ColumnSpacing="2">
+
+                <!-- Menu hamburguesa: abre el flyout de Shell (constitucion A.9). -->
+                <ImageButton x:Name="MenuButton"
+                             Grid.Column="0"
+                             Source="ic_menu.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             Clicked="OnMenuClicked" />
 
                 <ImageButton x:Name="UpButton"
-                             Grid.Column="0"
+                             Grid.Column="1"
                              Source="ic_arrow_back.png"
                              BackgroundColor="Transparent"
                              WidthRequest="44"
@@ -24,7 +37,7 @@
                              IsVisible="False"
                              Clicked="OnUpClicked" />
 
-                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Padding="8,0" Spacing="0">
+                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Padding="8,0" Spacing="0">
                     <Label x:Name="TitleLabel"
                            FontSize="19"
                            FontAttributes="Bold"
@@ -37,7 +50,7 @@
                 </VerticalStackLayout>
 
                 <ImageButton x:Name="SearchButton"
-                             Grid.Column="2"
+                             Grid.Column="3"
                              Source="ic_search.png"
                              BackgroundColor="Transparent"
                              WidthRequest="44"
@@ -48,7 +61,7 @@
                              Clicked="OnSearchToggleClicked" />
 
                 <ImageButton x:Name="MoreButton"
-                             Grid.Column="3"
+                             Grid.Column="4"
                              Source="ic_more.png"
                              BackgroundColor="Transparent"
                              WidthRequest="44"

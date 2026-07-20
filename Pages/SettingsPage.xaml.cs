@@ -62,6 +62,12 @@ public partial class SettingsPage : ContentPage
     private void UpdateLanguageButtons()
     {
         var isSpanish = _l.CurrentLanguage == "es";
+
+        // El nombre del idioma se resuelve por localizacion (constitucion 8); la bandera es un
+        // glifo decorativo (indicador regional) que se antepone.
+        SpanishButton.Text = $"🇪🇸 {_l["SettingsLanguageSpanish"]}";
+        EnglishButton.Text = $"🇺🇸 {_l["SettingsLanguageEnglish"]}";
+
         SpanishButton.Style = LookupStyle(isSpanish ? "PrimaryButton" : "OutlineButton");
         EnglishButton.Style = LookupStyle(isSpanish ? "OutlineButton" : "PrimaryButton");
     }

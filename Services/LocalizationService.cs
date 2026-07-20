@@ -91,6 +91,8 @@ public class LocalizationService : ILocalizationService
 
         // Navegacion y barra superior
         ["InternalStorage"] = "Internal storage",
+        ["Home"] = "Home",
+        ["Menu"] = "Menu",
         ["Search"] = "Search",
         ["SearchPlaceholder"] = "Search in this folder…",
         ["NewFolder"] = "New folder",
@@ -237,7 +239,13 @@ public class LocalizationService : ILocalizationService
         ["ErrorEmail"] = "The email app could not be opened",
         ["BrowserNotAvailable"] = "Browser not available",
         ["LinkCopied"] = "The link was copied to the clipboard",
-        ["ErrorBrowser"] = "The browser could not be opened"
+        ["ErrorBrowser"] = "The browser could not be opened",
+
+        // Comprobacion de version (constitucion 15)
+        ["UpdateAvailableTitle"] = "Update available",
+        ["UpdateAvailableMessage"] = "A newer version ({0}) is available. You have {1}.\nDo you want to update?",
+        ["UpdateNow"] = "Update",
+        ["UpdateLater"] = "Not now"
     };
 
     private static readonly Dictionary<string, string> Spanish = new()
@@ -248,6 +256,8 @@ public class LocalizationService : ILocalizationService
 
         // Navegacion y barra superior
         ["InternalStorage"] = "Almacenamiento interno",
+        ["Home"] = "Inicio",
+        ["Menu"] = "Menú",
         ["Search"] = "Buscar",
         ["SearchPlaceholder"] = "Buscar en esta carpeta…",
         ["NewFolder"] = "Nueva carpeta",
@@ -394,6 +404,12 @@ public class LocalizationService : ILocalizationService
         ["ErrorEmail"] = "No se ha podido abrir la aplicación de correo",
         ["BrowserNotAvailable"] = "Navegador no disponible",
         ["LinkCopied"] = "El enlace se ha copiado al portapapeles",
-        ["ErrorBrowser"] = "No se ha podido abrir el navegador"
+        ["ErrorBrowser"] = "No se ha podido abrir el navegador",
+
+        // Comprobacion de version (constitucion 15)
+        ["UpdateAvailableTitle"] = "Actualización disponible",
+        ["UpdateAvailableMessage"] = "Hay una versión más reciente ({0}). Tienes la {1}.\n¿Quieres actualizar?",
+        ["UpdateNow"] = "Actualizar",
+        ["UpdateLater"] = "Ahora no"
     };
 }

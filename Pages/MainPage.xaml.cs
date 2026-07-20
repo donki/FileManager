@@ -15,6 +15,7 @@ public partial class MainPage : ContentPage
     private readonly ILocalizationService _l;
     private readonly IStoragePermissionService _permissions;
     private readonly IToastService _toast;
+    private readonly UpdateService _update;
     private readonly ILogger<MainPage> _logger;
 
     private readonly ObservableCollection<FileItem> _items = new();
@@ -34,6 +35,7 @@ public partial class MainPage : ContentPage
         ILocalizationService localization,
         IStoragePermissionService permissions,
         IToastService toast,
+        UpdateService update,
         ILogger<MainPage> logger)
     {
         InitializeComponent();
@@ -45,6 +47,7 @@ public partial class MainPage : ContentPage
         _l = localization;
         _permissions = permissions;
         _toast = toast;
+        _update = update;
         _logger = logger;
 
         FilesView.ItemsSource = _items;
@@ -69,6 +72,10 @@ public partial class MainPage : ContentPage
 
         ApplyTexts();
         UpdatePasteBar();
+
+        // Comprobacion de version al arrancar (constitucion 15): no bloqueante y silenciosa si ya
+        // se esta al dia. El propio servicio solo comprueba una vez por sesion.
+        _ = _update.CheckAndPromptAsync(this);
 
         await RefreshAccessAsync();
     }
@@ -328,6 +335,13 @@ public partial class MainPage : ContentPage
         // La carpeta actual queda a la derecha del todo: se desplaza para que se vea.
         Dispatcher.Dispatch(async () =>
             await BreadcrumbScroll.ScrollToAsync(BreadcrumbBar, ScrollToPosition.End, false));
+    }
+
+    private void OnMenuClicked(object? sender, EventArgs e)
+    {
+        // Abre el menu hamburguesa (flyout de Shell): navegacion de primer nivel (constitucion A.9).
+        if (Shell.Current is not null)
+            Shell.Current.FlyoutIsPresented = true;
     }
 
     private async void OnUpClicked(object? sender, EventArgs e) => await NavigateUpIfPossible();

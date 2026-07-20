@@ -68,6 +68,12 @@ public partial class AboutPage : ContentPage
     private void UpdateLanguageButtons()
     {
         var isSpanish = _l.CurrentLanguage == "es";
+
+        // El nombre del idioma se resuelve por localizacion (constitucion 8); la bandera es un
+        // glifo decorativo (indicador regional) y se antepone como tal.
+        SpanishButton.Text = $"🇪🇸 {_l["SettingsLanguageSpanish"]}";
+        EnglishButton.Text = $"🇺🇸 {_l["SettingsLanguageEnglish"]}";
+
         SpanishButton.Style = LookupStyle(isSpanish ? "PrimaryButton" : "OutlineButton");
         EnglishButton.Style = LookupStyle(isSpanish ? "OutlineButton" : "PrimaryButton");
     }
@@ -89,7 +95,15 @@ public partial class AboutPage : ContentPage
         ApplyTexts();
     }
 
-    private async void OnBackClicked(object? sender, EventArgs e) => await Navigation.PopAsync();
+    private async void OnBackClicked(object? sender, EventArgs e)
+    {
+        // Con Shell la pagina puede haberse abierto desde el flyout (sin pila que desapilar) o
+        // apilada desde el menu «⋮»/Configuracion. Si hay pila, se desapila; si no, se vuelve a Inicio.
+        if (Navigation.NavigationStack.Count > 1)
+            await Navigation.PopAsync();
+        else if (Shell.Current is not null)
+            await Shell.Current.GoToAsync("//MainPage");
+    }
 
     private async void OnContactEmailClicked(object? sender, EventArgs e)
     {

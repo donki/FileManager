@@ -28,6 +28,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IFileSystemService, FileSystemService>();
         builder.Services.AddSingleton<IFileClipboardService, FileClipboardService>();
         builder.Services.AddSingleton<IFileActionsService, FileActionsService>();
+        builder.Services.AddSingleton<UpdateService>();
 #if ANDROID
         builder.Services.AddSingleton<IStoragePermissionService, Platforms.Android.StoragePermissionService>();
         builder.Services.AddSingleton<IToastService, Platforms.Android.ToastService>();
