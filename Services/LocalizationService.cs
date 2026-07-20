@@ -133,6 +133,24 @@ public class LocalizationService : ILocalizationService
         ["Paste"] = "Paste",
         ["Delete"] = "Delete",
         ["Share"] = "Share",
+
+        // Seleccion multiple / operaciones en lote
+        ["Select"] = "Select",
+        ["SelectAll"] = "Select all",
+        ["SelectedCount"] = "{0} selected",
+        ["NothingSelected"] = "Select some items first",
+        ["DeleteManyConfirm"] = "Delete {0} selected items?",
+
+        // Filtro por tipo
+        ["Filter"] = "Filter by type",
+        ["FilterAll"] = "All types",
+        ["FilterImages"] = "Images",
+        ["FilterVideo"] = "Video",
+        ["FilterAudio"] = "Audio",
+        ["FilterDocuments"] = "Documents",
+        ["FilterApk"] = "APK",
+        ["FilterArchives"] = "Archives",
+        ["FilterOther"] = "Other",
         ["Details"] = "Details",
         ["Cancel"] = "Cancel",
         ["Ok"] = "OK",
@@ -298,6 +316,24 @@ public class LocalizationService : ILocalizationService
         ["Paste"] = "Pegar",
         ["Delete"] = "Eliminar",
         ["Share"] = "Compartir",
+
+        // Seleccion multiple / operaciones en lote
+        ["Select"] = "Seleccionar",
+        ["SelectAll"] = "Seleccionar todo",
+        ["SelectedCount"] = "{0} seleccionados",
+        ["NothingSelected"] = "Selecciona algún elemento primero",
+        ["DeleteManyConfirm"] = "¿Eliminar los {0} elementos seleccionados?",
+
+        // Filtro por tipo
+        ["Filter"] = "Filtrar por tipo",
+        ["FilterAll"] = "Todos los tipos",
+        ["FilterImages"] = "Imágenes",
+        ["FilterVideo"] = "Vídeo",
+        ["FilterAudio"] = "Audio",
+        ["FilterDocuments"] = "Documentos",
+        ["FilterApk"] = "APK",
+        ["FilterArchives"] = "Comprimidos",
+        ["FilterOther"] = "Otros",
         ["Details"] = "Detalles",
         ["Cancel"] = "Cancelar",
         ["Ok"] = "Aceptar",
