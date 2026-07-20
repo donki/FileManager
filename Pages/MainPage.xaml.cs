@@ -20,6 +20,15 @@ public partial class MainPage : ContentPage
 
     private readonly ObservableCollection<FileItem> _items = new();
 
+    /// <summary>Lista completa cargada de la carpeta (sin filtrar). `_items` es su vista filtrada.</summary>
+    private readonly List<FileItem> _allItems = new();
+
+    /// <summary>Filtro por tipo activo (null = todos).</summary>
+    private FileCategory? _typeFilter;
+
+    /// <summary>Modo de selección múltiple activo (operaciones en lote).</summary>
+    private bool _selectMode;
+
     private string _currentPath = string.Empty;
     private bool _searchActive;
     private CancellationTokenSource? _searchCts;
@@ -141,6 +150,7 @@ public partial class MainPage : ContentPage
         PermissionButton.Text = _l["PermissionGrant"];
         PasteConfirmButton.Text = _l["Paste"];
         PasteCancelButton.Text = _l["Cancel"];
+        SelectAllButton.Text = _l["SelectAll"];
 
         UpdateHeader();
     }
@@ -151,12 +161,16 @@ public partial class MainPage : ContentPage
         TitleLabel.Text = isRoot ? _l["InternalStorage"] : Path.GetFileName(_currentPath);
         UpButton.IsVisible = !isRoot;
 
-        SubtitleLabel.Text = _items.Count switch
+        var count = _items.Count switch
         {
             0 => string.Empty,
             1 => _l["OneItem"],
             _ => string.Format(_l.CurrentCulture, _l["ItemsCount"], _items.Count)
         };
+        // Si hay filtro por tipo activo, se indica en el subtítulo.
+        SubtitleLabel.Text = _typeFilter is null
+            ? count
+            : (string.IsNullOrEmpty(count) ? FilterName(_typeFilter) : $"{count}  ·  {FilterName(_typeFilter)}");
     }
 
     // ============ Permisos ============
@@ -222,20 +236,25 @@ public partial class MainPage : ContentPage
 
     private void Populate(IReadOnlyList<FileItem> items, bool isSearch)
     {
-        _items.Clear();
+        // Cambiar de carpeta/lista sale del modo selección.
+        if (_selectMode)
+            ExitSelectionMode();
 
+        _allItems.Clear();
         foreach (var item in items)
         {
             item.Icon = FileIcons.For(item);
             item.Details = DescribeItem(item);
-            _items.Add(item);
+            item.IsSelected = false;
+            _allItems.Add(item);
         }
 
         FilesView.IsVisible = true;
         PermissionView.IsVisible = false;
         NewFolderButton.IsVisible = !isSearch;
 
-        EmptyView.IsVisible = _items.Count == 0;
+        ApplyFilterAndShow();
+
         EmptyIconLabel.Text = isSearch ? "🔍" : "📂";
         EmptyTitleLabel.Text = isSearch ? _l["NoSearchResults"] : _l["EmptyFolder"];
         EmptyHintLabel.IsVisible = !isSearch;
@@ -243,6 +262,57 @@ public partial class MainPage : ContentPage
         BuildBreadcrumb();
         UpdateHeader();
         UpdatePasteBar();
+    }
+
+    /// <summary>Rellena <see cref="_items"/> desde <see cref="_allItems"/> aplicando el filtro por
+    /// tipo. Las CARPETAS se muestran siempre (para poder seguir navegando aunque haya filtro).</summary>
+    private void ApplyFilterAndShow()
+    {
+        _items.Clear();
+        foreach (var item in _allItems)
+        {
+            if (_typeFilter is null || item.IsDirectory || item.Category == _typeFilter)
+                _items.Add(item);
+        }
+        EmptyView.IsVisible = _items.Count == 0;
+    }
+
+    /// <summary>Nombre localizado de una categoría de tipo (para el menú y el subtítulo).</summary>
+    private string FilterName(FileCategory? category) => category switch
+    {
+        null => _l["FilterAll"],
+        FileCategory.Image => _l["FilterImages"],
+        FileCategory.Video => _l["FilterVideo"],
+        FileCategory.Audio => _l["FilterAudio"],
+        FileCategory.Document => _l["FilterDocuments"],
+        FileCategory.Apk => _l["FilterApk"],
+        FileCategory.Archive => _l["FilterArchives"],
+        _ => _l["FilterOther"]
+    };
+
+    private async Task ShowFilterMenuAsync()
+    {
+        var options = new (string Label, FileCategory? Cat)[]
+        {
+            (_l["FilterAll"], null),
+            (_l["FilterImages"], FileCategory.Image),
+            (_l["FilterVideo"], FileCategory.Video),
+            (_l["FilterAudio"], FileCategory.Audio),
+            (_l["FilterDocuments"], FileCategory.Document),
+            (_l["FilterApk"], FileCategory.Apk),
+            (_l["FilterArchives"], FileCategory.Archive),
+            (_l["FilterOther"], FileCategory.Other),
+        };
+
+        var choice = await DisplayActionSheet(_l["Filter"], _l["Cancel"], null,
+            options.Select(o => o.Label).ToArray());
+        if (choice is null || choice == _l["Cancel"])
+            return;
+
+        var picked = options.FirstOrDefault(o => o.Label == choice);
+        _typeFilter = picked.Cat;
+        ApplyFilterAndShow();
+        UpdateHeader();
     }
 
     /// <summary>Linea secundaria de cada fila: fecha y, para ficheros, tamano.</summary>
@@ -368,6 +438,13 @@ public partial class MainPage : ContentPage
 
     protected override bool OnBackButtonPressed()
     {
+        // En modo selección, el botón atrás sale de la selección.
+        if (_selectMode)
+        {
+            Dispatcher.Dispatch(ExitSelectionMode);
+            return true;
+        }
+
         // El boton atras de Android sube una carpeta en lugar de cerrar la aplicacion.
         if (_searchActive || !IsRoot(_currentPath))
         {
@@ -382,6 +459,14 @@ public partial class MainPage : ContentPage
     {
         if ((sender as BindableObject)?.BindingContext is not FileItem item)
             return;
+
+        // En modo selección, tocar una fila la marca/desmarca (no abre).
+        if (_selectMode)
+        {
+            item.IsSelected = !item.IsSelected;
+            UpdateSelectionCount();
+            return;
+        }
 
         if (item.IsDirectory)
         {
@@ -629,6 +714,109 @@ public partial class MainPage : ContentPage
         }
     }
 
+    // ============ Selección múltiple / operaciones en lote ============
+
+    private void EnterSelectionMode()
+    {
+        if (_selectMode)
+            return;
+        if (_searchActive)
+            ExitSearch();
+        _selectMode = true;
+        SelectionBar.IsVisible = true;
+        SearchButton.IsVisible = false;
+        NewFolderButton.IsVisible = false;
+        PasteBar.IsVisible = false;
+        UpdateSelectionCount();
+    }
+
+    private void ExitSelectionMode()
+    {
+        _selectMode = false;
+        foreach (var it in _allItems)
+            it.IsSelected = false;
+        SelectionBar.IsVisible = false;
+        SearchButton.IsVisible = true;
+        NewFolderButton.IsVisible = !_searchActive;
+        UpdatePasteBar();
+    }
+
+    private List<FileItem> SelectedItems() => _items.Where(i => i.IsSelected).ToList();
+
+    private void UpdateSelectionCount()
+    {
+        var n = _items.Count(i => i.IsSelected);
+        SelCountLabel.Text = string.Format(_l.CurrentCulture, _l["SelectedCount"], n);
+    }
+
+    private void OnSelectionCloseClicked(object? sender, EventArgs e) => ExitSelectionMode();
+
+    private void OnSelectAllClicked(object? sender, EventArgs e)
+    {
+        var visible = _items.ToList();
+        var allSelected = visible.Count > 0 && visible.All(i => i.IsSelected);
+        foreach (var it in visible)
+            it.IsSelected = !allSelected;
+        UpdateSelectionCount();
+    }
+
+    private async void OnBatchActionsClicked(object? sender, EventArgs e)
+    {
+        var selected = SelectedItems();
+        if (selected.Count == 0)
+        {
+            _toast.Show(_l["NothingSelected"]);
+            return;
+        }
+
+        var choice = await DisplayActionSheet(
+            string.Format(_l.CurrentCulture, _l["SelectedCount"], selected.Count),
+            _l["Cancel"], null,
+            _l["Copy"], _l["Cut"], _l["Delete"]);
+
+        if (choice == _l["Copy"])
+        {
+            _clipboard.Set(selected.Select(i => i.FullPath).ToArray(), isMove: false);
+            ExitSelectionMode();
+        }
+        else if (choice == _l["Cut"])
+        {
+            _clipboard.Set(selected.Select(i => i.FullPath).ToArray(), isMove: true);
+            ExitSelectionMode();
+        }
+        else if (choice == _l["Delete"])
+        {
+            await BatchDeleteAsync(selected);
+        }
+    }
+
+    private async Task BatchDeleteAsync(IReadOnlyList<FileItem> selected)
+    {
+        if (_settings.ConfirmDelete)
+        {
+            var message = string.Format(_l.CurrentCulture, _l["DeleteManyConfirm"], selected.Count);
+            if (!await DisplayAlert(_l["DeleteTitle"], message, _l["Delete"], _l["Cancel"]))
+                return;
+        }
+
+        SetBusy(true);
+        try
+        {
+            var result = await _files.DeleteAsync(selected.Select(i => i.FullPath).ToArray());
+            ExitSelectionMode();
+            await LoadAsync(_currentPath);
+
+            if (result.HasErrors)
+                await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorDelete"], string.Join("\n", result.Errors)), _l["Ok"]);
+            else
+                _toast.Show(string.Format(_l.CurrentCulture, _l["Deleted"], result.Succeeded));
+        }
+        finally
+        {
+            SetBusy(false);
+        }
+    }
+
     // ============ Nueva carpeta ============
 
     private async void OnNewFolderClicked(object? sender, EventArgs e)
@@ -771,9 +959,17 @@ public partial class MainPage : ContentPage
             _l["More"],
             _l["Cancel"],
             null,
-            _l["Sort"], hidden, _l["Refresh"], _l["Settings"], _l["About"]);
+            _l["Select"], _l["Filter"], _l["Sort"], hidden, _l["Refresh"], _l["Settings"], _l["About"]);
 
-        if (choice == _l["Sort"])
+        if (choice == _l["Select"])
+        {
+            EnterSelectionMode();
+        }
+        else if (choice == _l["Filter"])
+        {
+            await ShowFilterMenuAsync();
+        }
+        else if (choice == _l["Sort"])
         {
             await ShowSortMenuAsync();
         }
