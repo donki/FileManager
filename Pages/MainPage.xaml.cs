@@ -568,12 +568,18 @@ public partial class MainPage : ContentPage
             return;
 
         var options = item.IsDirectory
-            ? new[] { _l["Open"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] }
-            : new[] { _l["Open"], _l["Share"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] };
+            ? new[] { _l["Select"], _l["Open"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] }
+            : new[] { _l["Select"], _l["Open"], _l["Share"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] };
 
         var choice = await DisplayActionSheet(item.Name, _l["Cancel"], null, options);
 
-        if (choice == _l["Open"])
+        if (choice == _l["Select"])
+        {
+            EnterSelectionMode();
+            item.IsSelected = true;
+            UpdateSelectionCount();
+        }
+        else if (choice == _l["Open"])
         {
             if (item.IsDirectory)
                 await LoadAsync(item.FullPath);
