@@ -195,7 +195,7 @@ public partial class MainPage : ContentPage
         {
             _awaitingPermission = false;
             _logger.LogError(ex, "Could not open the storage permission settings");
-            await DisplayAlert(_l["Error"], ex.Message, _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], ex.Message, _l["Ok"]);
         }
     }
 
@@ -220,13 +220,13 @@ public partial class MainPage : ContentPage
         }
         catch (UnauthorizedAccessException)
         {
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorAccessDenied"], path), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorAccessDenied"], path), _l["Ok"]);
             await NavigateUpIfPossible();
         }
         catch (Exception ex) when (ex is IOException)
         {
             _logger.LogError(ex, "Could not list the folder");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorReadFolder"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorReadFolder"], ex.Message), _l["Ok"]);
         }
         finally
         {
@@ -304,7 +304,7 @@ public partial class MainPage : ContentPage
             (_l["FilterOther"], FileCategory.Other),
         };
 
-        var choice = await DisplayActionSheet(_l["Filter"], _l["Cancel"], null,
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this, _l["Filter"], _l["Cancel"],
             options.Select(o => o.Label).ToArray());
         if (choice is null || choice == _l["Cancel"])
             return;
@@ -455,10 +455,51 @@ public partial class MainPage : ContentPage
         return base.OnBackButtonPressed();
     }
 
+    // --- Pulsación larga: inicia el modo selección y marca el elemento ---
+    private IDispatcherTimer? _longPressTimer;
+    private FileItem? _pressItem;
+    private bool _longPressFired;
+
+    private void OnItemPressed(object? sender, PointerEventArgs e)
+    {
+        if ((sender as BindableObject)?.BindingContext is not FileItem item)
+            return;
+        _pressItem = item;
+        _longPressTimer?.Stop();
+        _longPressTimer = Dispatcher.CreateTimer();
+        _longPressTimer.Interval = TimeSpan.FromMilliseconds(450);
+        _longPressTimer.IsRepeating = false;
+        _longPressTimer.Tick += (_, _) =>
+        {
+            _longPressTimer?.Stop();
+            if (_pressItem is null)
+                return;
+            _longPressFired = true;                 // evita que el "tap" de soltar desmarque
+            if (!_selectMode)
+                EnterSelectionMode();
+            _pressItem.IsSelected = true;
+            UpdateSelectionCount();
+        };
+        _longPressTimer.Start();
+    }
+
+    private void OnItemReleased(object? sender, PointerEventArgs e)
+    {
+        _longPressTimer?.Stop();
+        _pressItem = null;
+    }
+
     private async void OnItemTapped(object? sender, TappedEventArgs e)
     {
         if ((sender as BindableObject)?.BindingContext is not FileItem item)
             return;
+
+        // Si acaba de dispararse una pulsación larga, ignora el tap que llega al soltar.
+        if (_longPressFired)
+        {
+            _longPressFired = false;
+            return;
+        }
 
         // En modo selección, tocar una fila la marca/desmarca (no abre).
         if (_selectMode)
@@ -485,12 +526,12 @@ public partial class MainPage : ContentPage
         try
         {
             if (!await _actions.OpenAsync(item.FullPath))
-                await DisplayAlert(_l["Error"], _l["ErrorNoAppForFile"], _l["Ok"]);
+                await SocShared.ModernDialog.AlertAsync(this, _l["Error"], _l["ErrorNoAppForFile"], _l["Ok"]);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not open the file");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorOpenFile"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorOpenFile"], ex.Message), _l["Ok"]);
         }
     }
 
@@ -551,7 +592,7 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Search failed");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorSearch"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorSearch"], ex.Message), _l["Ok"]);
         }
         finally
         {
@@ -571,7 +612,7 @@ public partial class MainPage : ContentPage
             ? new[] { _l["Select"], _l["Open"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] }
             : new[] { _l["Select"], _l["Open"], _l["Share"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] };
 
-        var choice = await DisplayActionSheet(item.Name, _l["Cancel"], null, options);
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this, item.Name, _l["Cancel"], options);
 
         if (choice == _l["Select"])
         {
@@ -623,19 +664,19 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not share the file");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorShare"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorShare"], ex.Message), _l["Ok"]);
         }
     }
 
     private async Task RenameAsync(FileItem item)
     {
-        var name = await DisplayPromptAsync(
+        var name = await SocShared.ModernDialog.PromptAsync(
+            this,
             _l["RenameTitle"],
             _l["RenamePrompt"],
             accept: _l["Save"],
             cancel: _l["Cancel"],
-            initialValue: item.Name,
-            maxLength: 255);
+            initialValue: item.Name);
 
         if (name is null)
             return;
@@ -656,7 +697,7 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Rename failed");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorRename"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorRename"], ex.Message), _l["Ok"]);
         }
     }
 
@@ -682,7 +723,7 @@ public partial class MainPage : ContentPage
             lines.Add($"{_l["DetailsSize"]}: {SizeFormatter.Format(item.Size, culture)}");
         }
 
-        await DisplayAlert(_l["Details"], string.Join("\n\n", lines), _l["Close"]);
+        await SocShared.ModernDialog.AlertAsync(this, _l["Details"], string.Join("\n\n", lines), _l["Close"]);
     }
 
     private string DescribeFileType(FileItem item) =>
@@ -699,7 +740,7 @@ public partial class MainPage : ContentPage
                 item.IsDirectory ? _l["DeleteFolderConfirm"] : _l["DeleteFileConfirm"],
                 item.Name);
 
-            if (!await DisplayAlert(_l["DeleteTitle"], message, _l["Delete"], _l["Cancel"]))
+            if (!await SocShared.ModernDialog.AlertAsync(this, _l["DeleteTitle"], message, _l["Delete"], _l["Cancel"]))
                 return;
         }
 
@@ -710,7 +751,7 @@ public partial class MainPage : ContentPage
             await LoadAsync(_currentPath);
 
             if (result.HasErrors)
-                await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorDelete"], string.Join("\n", result.Errors)), _l["Ok"]);
+                await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorDelete"], string.Join("\n", result.Errors)), _l["Ok"]);
             else
                 _toast.Show(string.Format(_l.CurrentCulture, _l["Deleted"], result.Succeeded));
         }
@@ -775,9 +816,9 @@ public partial class MainPage : ContentPage
             return;
         }
 
-        var choice = await DisplayActionSheet(
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this,
             string.Format(_l.CurrentCulture, _l["SelectedCount"], selected.Count),
-            _l["Cancel"], null,
+            _l["Cancel"],
             _l["Copy"], _l["Cut"], _l["Delete"]);
 
         if (choice == _l["Copy"])
@@ -801,7 +842,7 @@ public partial class MainPage : ContentPage
         if (_settings.ConfirmDelete)
         {
             var message = string.Format(_l.CurrentCulture, _l["DeleteManyConfirm"], selected.Count);
-            if (!await DisplayAlert(_l["DeleteTitle"], message, _l["Delete"], _l["Cancel"]))
+            if (!await SocShared.ModernDialog.AlertAsync(this, _l["DeleteTitle"], message, _l["Delete"], _l["Cancel"]))
                 return;
         }
 
@@ -813,7 +854,7 @@ public partial class MainPage : ContentPage
             await LoadAsync(_currentPath);
 
             if (result.HasErrors)
-                await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorDelete"], string.Join("\n", result.Errors)), _l["Ok"]);
+                await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorDelete"], string.Join("\n", result.Errors)), _l["Ok"]);
             else
                 _toast.Show(string.Format(_l.CurrentCulture, _l["Deleted"], result.Succeeded));
         }
@@ -827,12 +868,12 @@ public partial class MainPage : ContentPage
 
     private async void OnNewFolderClicked(object? sender, EventArgs e)
     {
-        var name = await DisplayPromptAsync(
+        var name = await SocShared.ModernDialog.PromptAsync(
+            this,
             _l["NewFolderTitle"],
             _l["NewFolderPrompt"],
             accept: _l["Save"],
-            cancel: _l["Cancel"],
-            maxLength: 255);
+            cancel: _l["Cancel"]);
 
         if (name is null)
             return;
@@ -849,7 +890,7 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not create the folder");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorCreateFolder"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorCreateFolder"], ex.Message), _l["Ok"]);
         }
     }
 
@@ -866,7 +907,7 @@ public partial class MainPage : ContentPage
             _ => _l["ErrorNameExists"]
         };
 
-        await DisplayAlert(_l["Error"], message, _l["Ok"]);
+        await SocShared.ModernDialog.AlertAsync(this, _l["Error"], message, _l["Ok"]);
         return false;
     }
 
@@ -903,7 +944,7 @@ public partial class MainPage : ContentPage
         var selfPaste = entry.Paths.FirstOrDefault(p => Directory.Exists(p) && _files.IsInside(p, _currentPath));
         if (selfPaste is not null)
         {
-            await DisplayAlert(_l["Error"], _l["ErrorPasteIntoItself"], _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], _l["ErrorPasteIntoItself"], _l["Ok"]);
             return;
         }
 
@@ -912,10 +953,9 @@ public partial class MainPage : ContentPage
 
         if (conflicts.Count > 0)
         {
-            var answer = await DisplayActionSheet(
+            var answer = await SocShared.ModernDialog.ActionSheetAsync(this,
                 string.Format(_l.CurrentCulture, _l["OverwriteConfirm"], string.Join(", ", conflicts)),
                 _l["Cancel"],
-                null,
                 _l["Replace"], _l["KeepBoth"]);
 
             if (answer == _l["Replace"])
@@ -937,7 +977,7 @@ public partial class MainPage : ContentPage
 
             if (result.HasErrors)
             {
-                await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorPaste"], string.Join("\n", result.Errors)), _l["Ok"]);
+                await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorPaste"], string.Join("\n", result.Errors)), _l["Ok"]);
             }
             else
             {
@@ -948,7 +988,7 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Paste failed");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorPaste"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorPaste"], ex.Message), _l["Ok"]);
         }
         finally
         {
@@ -961,10 +1001,9 @@ public partial class MainPage : ContentPage
     private async void OnMoreClicked(object? sender, EventArgs e)
     {
         var hidden = _settings.ShowHiddenFiles ? _l["ShowHiddenOff"] : _l["ShowHiddenOn"];
-        var choice = await DisplayActionSheet(
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this,
             _l["More"],
             _l["Cancel"],
-            null,
             _l["Select"], _l["Filter"], _l["Sort"], hidden, _l["Refresh"], _l["Settings"], _l["About"]);
 
         if (choice == _l["Select"])
@@ -1010,7 +1049,7 @@ public partial class MainPage : ContentPage
             [_l["SortSizeAsc"]] = SortMode.SizeAscending
         };
 
-        var choice = await DisplayActionSheet(_l["Sort"], _l["Cancel"], null, options.Keys.ToArray());
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this, _l["Sort"], _l["Cancel"], options.Keys.ToArray());
 
         if (choice is not null && options.TryGetValue(choice, out var mode))
         {

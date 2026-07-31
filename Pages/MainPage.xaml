@@ -107,6 +107,10 @@
                                       ColumnSpacing="10">
                                     <Grid.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnItemTapped" />
+                                        <!-- Mantener pulsado un elemento inicia el modo selección y lo marca. -->
+                                        <PointerGestureRecognizer PointerPressed="OnItemPressed"
+                                                                  PointerReleased="OnItemReleased"
+                                                                  PointerExited="OnItemReleased" />
                                     </Grid.GestureRecognizers>
 
                                     <Border Grid.Column="0"

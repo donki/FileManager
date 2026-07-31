@@ -34,7 +34,7 @@
     <Shell.FlyoutHeader>
         <Grid BackgroundColor="{StaticResource Primary}" HeightRequest="140" Padding="20,40,20,20">
             <VerticalStackLayout VerticalOptions="Center" Spacing="6">
-                <Image Source="app_logo.png" HeightRequest="48" WidthRequest="48" HorizontalOptions="Start" />
+                <Image Source="menu_logo.png" HeightRequest="48" WidthRequest="48" HorizontalOptions="Start" />
                 <Label x:Name="HeaderTitle"
                        FontSize="18"
                        FontAttributes="Bold"
@@ -55,5 +55,15 @@
     <FlyoutItem x:Name="AboutItem" Route="AboutPage" FlyoutIcon="ic_info.png">
         <ShellContent ContentTemplate="{DataTemplate pages:AboutPage}" Route="AboutPage" />
     </FlyoutItem>
+
+    <!-- Pie del menú con la versión (constitución §6: versión visible). -->
+    <Shell.FlyoutFooter>
+        <Grid Padding="20,12" ColumnDefinitions="*">
+            <Label x:Name="FooterVersionLabel"
+                   FontSize="12"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+        </Grid>
+    </Shell.FlyoutFooter>
 
 </Shell>

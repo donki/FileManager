@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Primer plano del icono: carpeta blanca sólida con un documento asomando. Glifo
-     grande y de alto contraste sobre el azul de marca. -->
+<!-- Primer plano: carpeta moderna con documento asomando. Sombra suave, degradados sutiles
+     y esquinas redondeadas. Glifo grande y de alto contraste dentro de la zona segura. -->
 <svg xmlns="http://www.w3.org/2000/svg" width="456" height="456" viewBox="0 0 456 456">
+  <defs>
+    <linearGradient id="folderTop" x1="0" y1="168" x2="0" y2="236" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#EAF1F9" />
+    </linearGradient>
+    <linearGradient id="folderFront" x1="0" y1="236" x2="0" y2="344" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#D2E0EF" />
+    </linearGradient>
+    <linearGradient id="doc" x1="182" y1="112" x2="300" y2="238" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#D6D3FF" />
+      <stop offset="1" stop-color="#C3C0FF" />
+    </linearGradient>
+  </defs>
 
-  <!-- Documento que asoma por detrás de la carpeta -->
+  <!-- Sombra suave bajo la carpeta -->
+  <rect x="86" y="316" width="284" height="34" rx="17" fill="#0A2A47" opacity="0.28" />
+
+  <!-- Documento que asoma por detrás -->
   <g>
-    <path d="M182 120 h72 l40 40 v70 h-112 Z" fill="#FDBA74" />
-    <path d="M254 120 l40 40 h-40 Z" fill="#E67E22" />
-    <rect x="200" y="158" width="72" height="9" rx="4.5" fill="#E67E22" opacity="0.85" />
-    <rect x="200" y="180" width="72" height="9" rx="4.5" fill="#E67E22" opacity="0.85" />
-    <rect x="200" y="202" width="48" height="9" rx="4.5" fill="#E67E22" opacity="0.85" />
+    <path d="M186 112 h70 l40 40 v66 h-110 Z" fill="url(#doc)" />
+    <path d="M256 112 l40 40 h-40 Z" fill="#9C93F5" />
+    <rect x="204" y="150" width="70" height="9" rx="4.5" fill="#9C93F5" opacity="0.9" />
+    <rect x="204" y="172" width="70" height="9" rx="4.5" fill="#9C93F5" opacity="0.9" />
+    <rect x="204" y="194" width="46" height="9" rx="4.5" fill="#9C93F5" opacity="0.9" />
   </g>
 
-  <!-- Carpeta blanca sólida (pestaña + cuerpo) -->
-  <path d="M74 196
+  <!-- Cuerpo de la carpeta (pestaña + parte trasera) -->
+  <path d="M78 194
            a26 26 0 0 1 26 -26
-           h84
+           h80
            a26 26 0 0 1 18.4 7.6
            l22.6 22.6
-           H356
+           H352
            a26 26 0 0 1 26 26
-           v96
+           v92
            a26 26 0 0 1 -26 26
-           H100
+           H104
            a26 26 0 0 1 -26 -26
-           Z" fill="#FFFFFF" />
+           Z" fill="url(#folderTop)" />
 
-  <!-- Frente de la carpeta (tono para dar profundidad) -->
-  <path d="M74 236 h308 v82 a26 26 0 0 1 -26 26 H100 a26 26 0 0 1 -26 -26 Z"
-        fill="#DCE7F2" />
-
+  <!-- Solapa frontal de la carpeta (con degradado para dar profundidad) -->
+  <path d="M78 232 h300 v84 a26 26 0 0 1 -26 26 H104 a26 26 0 0 1 -26 -26 Z"
+        fill="url(#folderFront)" />
+  <!-- Línea de luz en el borde superior de la solapa -->
+  <rect x="78" y="232" width="300" height="4" fill="#FFFFFF" opacity="0.7" />
 </svg>

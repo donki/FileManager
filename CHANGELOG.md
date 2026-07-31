@@ -4,6 +4,23 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.07.26.0] — 2026-07-26
+
+`versionCode`: 202607260
+
+### Añadido
+- Permiso `REQUEST_INSTALL_PACKAGES`. Al tocar un fichero `.apk` la acción por defecto es
+  **abrir**, que delega en el instalador de paquetes del sistema (`ACTION_VIEW` +
+  `application/vnd.android.package-archive`, que ya devolvía `MimeTypes.ForPath`). Sin este
+  permiso el instalador se abría pero no podía completar la instalación. El usuario sigue
+  confirmando cada instalación en el diálogo del sistema; la app no instala nada de forma
+  silenciosa (constitución §5: cada permiso justificado).
+
+### Notas
+- Un toque sobre un fichero ya invocaba `Launcher.Default.OpenAsync` con su MIME
+  (`FileActionsService.OpenAsync`); el único cambio necesario para «abrir/instalar APK con un
+  clic» era declarar el permiso anterior.
+
 ## [2026.07.17.0] — 2026-07-17
 
 `versionCode`: 202607170

@@ -119,12 +119,12 @@ public partial class AboutPage : ContentPage
         }
         catch (FeatureNotSupportedException)
         {
-            await DisplayAlert(_l["Error"], _l["ErrorEmailNotAvailable"], _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], _l["ErrorEmailNotAvailable"], _l["Ok"]);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not open the email client");
-            await DisplayAlert(_l["Error"], $"{_l["ErrorEmail"]}: {ex.Message}", _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], $"{_l["ErrorEmail"]}: {ex.Message}", _l["Ok"]);
         }
     }
 
@@ -148,12 +148,12 @@ public partial class AboutPage : ContentPage
             try
             {
                 await Clipboard.Default.SetTextAsync(DonationUrl);
-                await DisplayAlert(_l["BrowserNotAvailable"], $"{_l["LinkCopied"]}:\n{DonationUrl}", _l["Ok"]);
+                await SocShared.ModernDialog.AlertAsync(this, _l["BrowserNotAvailable"], $"{_l["LinkCopied"]}:\n{DonationUrl}", _l["Ok"]);
             }
             catch (Exception clipboardEx)
             {
                 _logger.LogError(clipboardEx, "The clipboard is not available either");
-                await DisplayAlert(_l["Error"], $"{_l["ErrorBrowser"]}: {DonationUrl}", _l["Ok"]);
+                await SocShared.ModernDialog.AlertAsync(this, _l["Error"], $"{_l["ErrorBrowser"]}: {DonationUrl}", _l["Ok"]);
             }
         }
     }

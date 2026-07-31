@@ -23,5 +23,6 @@ public partial class AppShell : Shell
         HomeItem.Title = _l["Home"];
         SettingsItem.Title = _l["Settings"];
         AboutItem.Title = _l["About"];
+        FooterVersionLabel.Text = $"v{AppInfo.Current.VersionString}";
     }
 }
