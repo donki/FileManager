@@ -16,8 +16,8 @@
     <ApplicationId>com.socratic.filemanager</ApplicationId>
 
     <!-- Versions (constitucion 6: ambos valores en sincronia) -->
-    <ApplicationDisplayVersion>2026.07.23.0</ApplicationDisplayVersion>
-    <ApplicationVersion>202607230</ApplicationVersion>
+    <ApplicationDisplayVersion>2026.07.28.0</ApplicationDisplayVersion>
+    <ApplicationVersion>202607282</ApplicationVersion>
 
     <!-- Accept Android SDK Licenses -->
     <AcceptAndroidSDKLicenses>true</AcceptAndroidSDKLicenses>
@@ -44,8 +44,8 @@
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
     <UseInterpreter>false</UseInterpreter>
 
-    <AssemblyVersion>2026.07.17.0</AssemblyVersion>
-    <FileVersion>2026.07.17.0</FileVersion>
+    <AssemblyVersion>2026.07.27.0</AssemblyVersion>
+    <FileVersion>2026.07.27.0</FileVersion>
   </PropertyGroup>
 
   <!-- Release configuration for Android -->
@@ -66,10 +66,10 @@
 
   <ItemGroup>
     <!-- App Icon: carpeta abierta sobre fondo azul (tematica de la aplicacion) -->
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#1E5C97" />
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#3525CD" />
 
     <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#1E5C97" BaseSize="180,180" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#3525CD" BaseSize="200,200" />
 
     <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
@@ -86,4 +86,11 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
   </ItemGroup>
 
+  <!-- Notas de autor compartidas (una sola fuente para todas las apps) -->
+  <ItemGroup>
+    <Compile Include="..\Shared\AuthorNotes.cs" Link="AuthorNotes.cs" />
+    <Compile Include="..\Shared\ModernDialog.cs" Link="ModernDialog.cs" />
+  </ItemGroup>
+
+  <Import Project="..\Shared\signing.props" />
 </Project>

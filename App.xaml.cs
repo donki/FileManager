@@ -15,6 +15,10 @@ public partial class App : Application
         // Shell con menu hamburguesa (constitucion A.9): la navegacion de primer nivel
         // (Inicio, Configuracion, Acerca de) vive en el flyout.
         var shell = new AppShell(ServiceHelper.GetRequiredService<ILocalizationService>());
-        return new Window(shell);
+        var window = new Window(shell);
+#if DEBUG
+        SocShared.AuthorNotes.Attach(window);   // notas de autor: SOLO Debug, desactivado en Release/produccion
+#endif
+        return window;
     }
 }

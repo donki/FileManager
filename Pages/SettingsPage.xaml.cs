@@ -139,7 +139,7 @@ public partial class SettingsPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not open the storage permission settings");
-            await DisplayAlert(_l["Error"], ex.Message, _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], ex.Message, _l["Ok"]);
         }
     }
 
