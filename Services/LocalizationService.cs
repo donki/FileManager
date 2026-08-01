@@ -91,6 +91,8 @@ public class LocalizationService : ILocalizationService
 
         // Navegacion y barra superior
         ["InternalStorage"] = "Internal storage",
+        ["Home"] = "Home",
+        ["Menu"] = "Menu",
         ["Search"] = "Search",
         ["SearchPlaceholder"] = "Search in this folder…",
         ["NewFolder"] = "New folder",
@@ -131,6 +133,24 @@ public class LocalizationService : ILocalizationService
         ["Paste"] = "Paste",
         ["Delete"] = "Delete",
         ["Share"] = "Share",
+
+        // Seleccion multiple / operaciones en lote
+        ["Select"] = "Select",
+        ["SelectAll"] = "Select all",
+        ["SelectedCount"] = "{0} selected",
+        ["NothingSelected"] = "Select some items first",
+        ["DeleteManyConfirm"] = "Delete {0} selected items?",
+
+        // Filtro por tipo
+        ["Filter"] = "Filter by type",
+        ["FilterAll"] = "All types",
+        ["FilterImages"] = "Images",
+        ["FilterVideo"] = "Video",
+        ["FilterAudio"] = "Audio",
+        ["FilterDocuments"] = "Documents",
+        ["FilterApk"] = "APK",
+        ["FilterArchives"] = "Archives",
+        ["FilterOther"] = "Other",
         ["Details"] = "Details",
         ["Cancel"] = "Cancel",
         ["Ok"] = "OK",
@@ -219,22 +239,31 @@ public class LocalizationService : ILocalizationService
         ["AboutTitle"] = "About",
         ["AboutVersion"] = "Version {0}",
         ["AboutContact"] = "Contact",
-        ["AboutContactHint"] = "Tap to send us an email",
-        ["AboutDonation"] = "Support development",
-        ["AboutDonationButton"] = "Ko-fi.com — Buy me a coffee",
-        ["AboutDonationHint"] = "Your support helps keep the app free and ad-free",
-        ["AboutLegal"] = "Legal notice",
-        ["AboutLegal1"] = "This software is provided “as is”, without warranty of any kind, express or implied, including but not limited to the warranties of merchantability and fitness for a particular purpose.",
-        ["AboutLegal2"] = "In no event shall the authors be liable for any loss of data or damage arising from the use of this application. Deleting, moving and overwriting files are irreversible operations.",
+        ["AboutContactHint"] = "Tap to send an email",
+        ["AboutLanguageHint"] = "Select your preferred language",
+        ["AboutDonation"] = "Support Development",
+        ["AboutDonationButton"] = "Ko-fi.com - Buy me a coffee",
+        ["AboutDonationHint"] = "Your support helps maintain and improve the app",
+        ["AboutLegal"] = "Legal Notice",
+        ["AboutLegal1"] = "This software is provided 'as is', without warranty of any kind. The user is responsible for proper use of the app and compliance with local laws.",
+        ["AboutLegal2"] = "In no event shall the authors be liable for any direct, indirect, incidental or consequential damages arising from the use of this software.",
         ["AboutWarning"] = "⚠️ Use at your own risk",
         ["AboutPrivacy"] = "Privacy",
-        ["AboutPrivacyText"] = "This app works entirely offline. Your files never leave your device and no usage data is collected.",
+        ["AboutPrivacyText"] = "This app does not collect your personal data or send it to the developers. Information is processed on your device for the app's own purpose.",
+        ["AboutLicense"] = "License",
+        ["AboutLicenseText"] = "This app is free software distributed under the MIT license.",
         ["EmailSubject"] = "Contact from File Manager",
         ["ErrorEmailNotAvailable"] = "No email app is available on this device.",
         ["ErrorEmail"] = "The email app could not be opened",
         ["BrowserNotAvailable"] = "Browser not available",
         ["LinkCopied"] = "The link was copied to the clipboard",
-        ["ErrorBrowser"] = "The browser could not be opened"
+        ["ErrorBrowser"] = "The browser could not be opened",
+
+        // Comprobacion de version (constitucion 15)
+        ["UpdateAvailableTitle"] = "Update available",
+        ["UpdateAvailableMessage"] = "A newer version ({0}) is available. You have {1}.\nDo you want to update?",
+        ["UpdateNow"] = "Update",
+        ["UpdateLater"] = "Not now"
     };
 
     private static readonly Dictionary<string, string> Spanish = new()
@@ -245,6 +274,8 @@ public class LocalizationService : ILocalizationService
 
         // Navegacion y barra superior
         ["InternalStorage"] = "Almacenamiento interno",
+        ["Home"] = "Inicio",
+        ["Menu"] = "Menú",
         ["Search"] = "Buscar",
         ["SearchPlaceholder"] = "Buscar en esta carpeta…",
         ["NewFolder"] = "Nueva carpeta",
@@ -285,6 +316,24 @@ public class LocalizationService : ILocalizationService
         ["Paste"] = "Pegar",
         ["Delete"] = "Eliminar",
         ["Share"] = "Compartir",
+
+        // Seleccion multiple / operaciones en lote
+        ["Select"] = "Seleccionar",
+        ["SelectAll"] = "Seleccionar todo",
+        ["SelectedCount"] = "{0} seleccionados",
+        ["NothingSelected"] = "Selecciona algún elemento primero",
+        ["DeleteManyConfirm"] = "¿Eliminar los {0} elementos seleccionados?",
+
+        // Filtro por tipo
+        ["Filter"] = "Filtrar por tipo",
+        ["FilterAll"] = "Todos los tipos",
+        ["FilterImages"] = "Imágenes",
+        ["FilterVideo"] = "Vídeo",
+        ["FilterAudio"] = "Audio",
+        ["FilterDocuments"] = "Documentos",
+        ["FilterApk"] = "APK",
+        ["FilterArchives"] = "Comprimidos",
+        ["FilterOther"] = "Otros",
         ["Details"] = "Detalles",
         ["Cancel"] = "Cancelar",
         ["Ok"] = "Aceptar",
@@ -373,21 +422,30 @@ public class LocalizationService : ILocalizationService
         ["AboutTitle"] = "Acerca de",
         ["AboutVersion"] = "Versión {0}",
         ["AboutContact"] = "Contacto",
-        ["AboutContactHint"] = "Toca para enviarnos un correo",
-        ["AboutDonation"] = "Apoya el desarrollo",
-        ["AboutDonationButton"] = "Ko-fi.com — Invítame a un café",
-        ["AboutDonationHint"] = "Tu apoyo ayuda a mantener la app gratuita y sin anuncios",
-        ["AboutLegal"] = "Aviso legal",
-        ["AboutLegal1"] = "Este software se proporciona «tal cual», sin garantía de ningún tipo, expresa o implícita, incluidas entre otras las garantías de comerciabilidad e idoneidad para un propósito particular.",
-        ["AboutLegal2"] = "En ningún caso los autores serán responsables de la pérdida de datos o de los daños derivados del uso de esta aplicación. Eliminar, mover y sobrescribir ficheros son operaciones irreversibles.",
+        ["AboutContactHint"] = "Toca para enviar un correo electrónico",
+        ["AboutLanguageHint"] = "Selecciona tu idioma preferido",
+        ["AboutDonation"] = "Apoya el Desarrollo",
+        ["AboutDonationButton"] = "Ko-fi.com - Invítame un café",
+        ["AboutDonationHint"] = "Tu apoyo ayuda a mantener y mejorar la aplicación",
+        ["AboutLegal"] = "Aviso Legal",
+        ["AboutLegal1"] = "Este software se proporciona «tal cual», sin garantías de ningún tipo. El usuario es responsable del uso adecuado de la aplicación y del cumplimiento de las leyes locales.",
+        ["AboutLegal2"] = "En ningún caso los autores serán responsables de daños directos, indirectos, incidentales o consecuentes que resulten del uso de este software.",
         ["AboutWarning"] = "⚠️ Uso bajo su propio riesgo",
         ["AboutPrivacy"] = "Privacidad",
-        ["AboutPrivacyText"] = "Esta aplicación funciona totalmente sin conexión. Tus ficheros nunca salen del dispositivo y no se recoge ningún dato de uso.",
+        ["AboutPrivacyText"] = "Esta aplicación no recopila tus datos personales ni los envía a los desarrolladores. La información se procesa en tu dispositivo para la función propia de la app.",
+        ["AboutLicense"] = "Licencia",
+        ["AboutLicenseText"] = "Esta aplicación es software libre distribuido bajo licencia MIT.",
         ["EmailSubject"] = "Contacto desde Gestor de Ficheros",
         ["ErrorEmailNotAvailable"] = "No hay ninguna aplicación de correo disponible en este dispositivo.",
         ["ErrorEmail"] = "No se ha podido abrir la aplicación de correo",
         ["BrowserNotAvailable"] = "Navegador no disponible",
         ["LinkCopied"] = "El enlace se ha copiado al portapapeles",
-        ["ErrorBrowser"] = "No se ha podido abrir el navegador"
+        ["ErrorBrowser"] = "No se ha podido abrir el navegador",
+
+        // Comprobacion de version (constitucion 15)
+        ["UpdateAvailableTitle"] = "Actualización disponible",
+        ["UpdateAvailableMessage"] = "Hay una versión más reciente ({0}). Tienes la {1}.\n¿Quieres actualizar?",
+        ["UpdateNow"] = "Actualizar",
+        ["UpdateLater"] = "Ahora no"
     };
 }

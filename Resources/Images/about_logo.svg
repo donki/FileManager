@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logo de la pantalla "Acerca de": icono de marca (cuadrado indigo redondeado + carpeta blanca),
+     coherente con el icono de la app en el lanzador. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="#3525CD"/>
+  <path fill="#FFFFFF" d="M96 380 V176 a30 30 0 0 1 30 -30 h94 l40 42 h126 a30 30 0 0 1 30 30 v162 a30 30 0 0 1 -30 30 H126 a30 30 0 0 1 -30 -30 Z"/>
+  <path fill="#C3C0FF" d="M96 218 h320 v-10 a30 30 0 0 0 -30 -30 H260 l-40 -42 h-94 a30 30 0 0 0 -30 30 Z"/>
+</svg>

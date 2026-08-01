@@ -17,11 +17,27 @@
   -->
   <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
+  <!--
+    INTERNET: unico uso es la comprobacion de version al arrancar (constitucion 15): se consulta
+    un manifiesto (appcast.json) en el repositorio del proyecto para avisar si hay una version mas
+    reciente. La aplicacion no envia datos del usuario ni gestiona ficheros por red.
+  -->
+  <uses-permission android:name="android.permission.INTERNET" />
+
   <!-- Android 10 (API 29) y anteriores: MANAGE_EXTERNAL_STORAGE no existe todavia. -->
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
                    android:maxSdkVersion="29" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
                    android:maxSdkVersion="29" />
+
+  <!--
+    REQUEST_INSTALL_PACKAGES: al tocar un fichero .apk la accion es "abrir", que delega en el
+    instalador de paquetes del sistema (ACTION_VIEW + application/vnd.android.package-archive).
+    Con este permiso el usuario puede completar la instalacion del APK que ha abierto. El usuario
+    confirma cada instalacion en el dialogo del sistema; la app no instala nada de forma silenciosa.
+    Uso permitido para gestores de ficheros (requiere declaracion en Play Console).
+  -->
+  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
   <!-- Consultar que aplicacion puede abrir o compartir cada fichero (Android 11+). -->
   <queries>
