@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:FileManager.Models"
+             xmlns:helpers="clr-namespace:FileManager.Helpers"
              x:Class="FileManager.Pages.MainPage"
              Shell.NavBarIsVisible="False"
              NavigationPage.HasNavigationBar="False">
@@ -105,13 +106,14 @@
                                 <Grid ColumnDefinitions="Auto,*,Auto"
                                       Padding="10,8"
                                       ColumnSpacing="10">
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnItemTapped" />
-                                        <!-- Mantener pulsado un elemento inicia el modo selección y lo marca. -->
-                                        <PointerGestureRecognizer PointerPressed="OnItemPressed"
-                                                                  PointerReleased="OnItemReleased"
-                                                                  PointerExited="OnItemReleased" />
-                                    </Grid.GestureRecognizers>
+                                    <!-- Toque y pulsación larga, los dos con los gestos nativos de Android:
+                                         mantener pulsado inicia el modo selección con ese elemento marcado.
+                                         No se usa TapGestureRecognizer porque su detector se come el
+                                         evento y la pulsación larga no llega a dispararse. -->
+                                    <Grid.Behaviors>
+                                        <helpers:ItemTouchBehavior Tapped="OnItemTapped"
+                                                                   LongPressed="OnItemLongPressed" />
+                                    </Grid.Behaviors>
 
                                     <Border Grid.Column="0"
                                             WidthRequest="44"

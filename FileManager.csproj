@@ -16,8 +16,8 @@
     <ApplicationId>com.socratic.filemanager</ApplicationId>
 
     <!-- Versions (constitucion 6: ambos valores en sincronia) -->
-    <ApplicationDisplayVersion>2026.07.28.0</ApplicationDisplayVersion>
-    <ApplicationVersion>202607282</ApplicationVersion>
+    <ApplicationDisplayVersion>2026.08.01.0</ApplicationDisplayVersion>
+    <ApplicationVersion>202608010</ApplicationVersion>
 
     <!-- Accept Android SDK Licenses -->
     <AcceptAndroidSDKLicenses>true</AcceptAndroidSDKLicenses>
@@ -65,11 +65,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- App Icon: carpeta abierta sobre fondo azul (tematica de la aplicacion) -->
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#1E5C97" />
+    <!-- App Icon: carpeta abierta sobre indigo unificado (#3525CD). El rediseño del 28-jul
+         cambio los SVG pero se dejo aqui el azul de la marca anterior. -->
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#3525CD" />
 
     <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#1E5C97" BaseSize="180,180" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#3525CD" BaseSize="180,180" />
 
     <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
@@ -85,5 +86,17 @@
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
   </ItemGroup>
+
+  <!-- Ficheros compartidos por las 7 apps (una sola fuente de verdad). Se perdieron en el
+       incidente de reorganizacion: sin ellos el proyecto no compila, porque las paginas usan
+       SocShared.ModernDialog. -->
+  <ItemGroup>
+    <Compile Include="..\Shared\AuthorNotes.cs" Link="AuthorNotes.cs" />
+    <Compile Include="..\Shared\ModernDialog.cs" Link="ModernDialog.cs" />
+  </ItemGroup>
+
+  <!-- Firma Release centralizada (constitucion 7). Define AndroidKeyStore=true, por lo que
+       manda sobre el valor de la seccion de Release de mas arriba. -->
+  <Import Project="..\Shared\signing.props" />
 
 </Project>

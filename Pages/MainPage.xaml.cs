@@ -456,50 +456,24 @@ public partial class MainPage : ContentPage
     }
 
     // --- Pulsación larga: inicia el modo selección y marca el elemento ---
-    private IDispatcherTimer? _longPressTimer;
-    private FileItem? _pressItem;
-    private bool _longPressFired;
-
-    private void OnItemPressed(object? sender, PointerEventArgs e)
+    // El gesto lo aporta LongPressBehavior (View.LongClick de Android); MAUI no trae ninguno.
+    private void OnItemLongPressed(object? sender, EventArgs e)
     {
-        if ((sender as BindableObject)?.BindingContext is not FileItem item)
-            return;
-        _pressItem = item;
-        _longPressTimer?.Stop();
-        _longPressTimer = Dispatcher.CreateTimer();
-        _longPressTimer.Interval = TimeSpan.FromMilliseconds(450);
-        _longPressTimer.IsRepeating = false;
-        _longPressTimer.Tick += (_, _) =>
-        {
-            _longPressTimer?.Stop();
-            if (_pressItem is null)
-                return;
-            _longPressFired = true;                 // evita que el "tap" de soltar desmarque
-            if (!_selectMode)
-                EnterSelectionMode();
-            _pressItem.IsSelected = true;
-            UpdateSelectionCount();
-        };
-        _longPressTimer.Start();
-    }
-
-    private void OnItemReleased(object? sender, PointerEventArgs e)
-    {
-        _longPressTimer?.Stop();
-        _pressItem = null;
-    }
-
-    private async void OnItemTapped(object? sender, TappedEventArgs e)
-    {
+        // El comportamiento hereda el BindingContext de la fila a la que está enganchado.
         if ((sender as BindableObject)?.BindingContext is not FileItem item)
             return;
 
-        // Si acaba de dispararse una pulsación larga, ignora el tap que llega al soltar.
-        if (_longPressFired)
-        {
-            _longPressFired = false;
+        if (!_selectMode)
+            EnterSelectionMode();
+
+        item.IsSelected = true;
+        UpdateSelectionCount();
+    }
+
+    private async void OnItemTapped(object? sender, EventArgs e)
+    {
+        if ((sender as BindableObject)?.BindingContext is not FileItem item)
             return;
-        }
 
         // En modo selección, tocar una fila la marca/desmarca (no abre).
         if (_selectMode)
