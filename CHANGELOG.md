@@ -4,6 +4,28 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.08.01.0] — 2026-08-01
+
+`versionCode`: 202608010
+
+### Añadido
+- **Pulsación larga sobre un elemento**: entra en el modo selección y deja marcado **ese**
+  elemento (nota de autor del 2026-08-01). Antes solo se entraba desde la barra de herramientas.
+  El gesto lo resuelve `Helpers\ItemTouchBehavior.cs` con `View.Click` y `View.LongClick` de
+  Android: MAUI no trae pulsación larga, `PointerGestureRecognizer` no dispara `PointerPressed`
+  con el dedo, y dejar el `TapGestureRecognizer` en la fila impide que salte la pulsación larga
+  porque su detector consume el evento táctil antes. Verificado en el emulador.
+
+### Corregido
+- La aplicación **abortaba al arrancar**: `UpdateService` no estaba registrado en `MauiProgram` y
+  `MainPage` lo pide por constructor. El registro se perdió en el incidente de reorganización.
+- El proyecto **no compilaba**: el `.csproj` había perdido los ficheros compartidos
+  (`..\Shared\ModernDialog.cs`, `..\Shared\AuthorNotes.cs`) y el `Import` de `signing.props`.
+- Icono y splash usaban todavía el azul `#1E5C97` de la marca anterior en el `.csproj`, cuando los
+  SVG ya eran del índigo unificado `#3525CD`.
+- `Resources\AppIcon\play_store_icon.png` regenerado desde los SVG actuales: mostraba el diseño
+  azul y naranja anterior al rediseño del 28-jul.
+
 ## [2026.07.15.0] — 2026-07-15
 
 `versionCode`: 202607150
