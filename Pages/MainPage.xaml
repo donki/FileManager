@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:FileManager.Models"
              x:Class="FileManager.Pages.MainPage"
+             Shell.NavBarIsVisible="False"
              NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="Auto,*">
@@ -10,17 +11,33 @@
         <!-- ============ Barra superior ============ -->
         <VerticalStackLayout Grid.Row="0" BackgroundColor="{StaticResource Primary}" Spacing="0">
 
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto" Padding="8,6" ColumnSpacing="2">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Padding="8,6" ColumnSpacing="2">
 
-                <Button x:Name="UpButton"
-                        Grid.Column="0"
-                        Text="←"
-                        FontSize="22"
-                        Style="{StaticResource HeaderIconButton}"
-                        IsVisible="False"
-                        Clicked="OnUpClicked" />
+                <!-- Menu hamburguesa: abre el flyout de Shell (constitucion A.9). -->
+                <ImageButton x:Name="MenuButton"
+                             Grid.Column="0"
+                             Source="ic_menu.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             Clicked="OnMenuClicked" />
 
-                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Padding="8,0" Spacing="0">
+                <ImageButton x:Name="UpButton"
+                             Grid.Column="1"
+                             Source="ic_arrow_back.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             IsVisible="False"
+                             Clicked="OnUpClicked" />
+
+                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Padding="8,0" Spacing="0">
                     <Label x:Name="TitleLabel"
                            FontSize="19"
                            FontAttributes="Bold"
@@ -28,22 +45,31 @@
                            LineBreakMode="TailTruncation" />
                     <Label x:Name="SubtitleLabel"
                            FontSize="12"
-                           TextColor="#CFE0F0"
+                           TextColor="{StaticResource SubtitleOnPrimary}"
                            LineBreakMode="TailTruncation" />
                 </VerticalStackLayout>
 
-                <Button x:Name="SearchButton"
-                        Grid.Column="2"
-                        Text="🔍"
-                        Style="{StaticResource HeaderIconButton}"
-                        Clicked="OnSearchToggleClicked" />
+                <ImageButton x:Name="SearchButton"
+                             Grid.Column="3"
+                             Source="ic_search.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             Clicked="OnSearchToggleClicked" />
 
-                <Button x:Name="MoreButton"
-                        Grid.Column="3"
-                        Text="⋮"
-                        FontSize="22"
-                        Style="{StaticResource HeaderIconButton}"
-                        Clicked="OnMoreClicked" />
+                <ImageButton x:Name="MoreButton"
+                             Grid.Column="4"
+                             Source="ic_more.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             Clicked="OnMoreClicked" />
             </Grid>
 
             <!-- Busqueda (oculta hasta que se pulsa la lupa) -->
@@ -81,6 +107,10 @@
                                       ColumnSpacing="10">
                                     <Grid.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnItemTapped" />
+                                        <!-- Mantener pulsado un elemento inicia el modo selección y lo marca. -->
+                                        <PointerGestureRecognizer PointerPressed="OnItemPressed"
+                                                                  PointerReleased="OnItemReleased"
+                                                                  PointerExited="OnItemReleased" />
                                     </Grid.GestureRecognizers>
 
                                     <Border Grid.Column="0"
@@ -88,12 +118,33 @@
                                             HeightRequest="44"
                                             StrokeThickness="0"
                                             VerticalOptions="Center"
-                                            BackgroundColor="{AppThemeBinding Light=#EDF3F9, Dark=#252D36}">
+                                            BackgroundColor="{AppThemeBinding Light={StaticResource IconTileLight}, Dark={StaticResource IconTileDark}}">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="22" />
                                         </Border.StrokeShape>
-                                        <Label Text="{Binding Icon}"
-                                               FontSize="21"
+                                        <Image Source="{Binding Icon}"
+                                               WidthRequest="24"
+                                               HeightRequest="24"
+                                               Aspect="AspectFit"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+
+                                    <!-- Casilla de selección múltiple: círculo con ✓ sobre el icono. -->
+                                    <Border Grid.Column="0"
+                                            WidthRequest="44"
+                                            HeightRequest="44"
+                                            StrokeThickness="0"
+                                            VerticalOptions="Center"
+                                            IsVisible="{Binding IsSelected}"
+                                            BackgroundColor="{StaticResource Primary}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="22" />
+                                        </Border.StrokeShape>
+                                        <Label Text="✓"
+                                               FontSize="22"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource White}"
                                                HorizontalOptions="Center"
                                                VerticalOptions="Center" />
                                     </Border>
@@ -126,6 +177,58 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+
+            <!-- Barra contextual de selección múltiple (arriba) -->
+            <Border x:Name="SelectionBar"
+                    IsVisible="False"
+                    VerticalOptions="Start"
+                    Margin="8,8"
+                    Padding="6,4"
+                    BackgroundColor="{StaticResource PrimaryDark}"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="4" VerticalOptions="Center">
+                    <Button x:Name="SelCloseButton"
+                            Grid.Column="0"
+                            Text="✕"
+                            FontSize="18"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            Padding="0"
+                            CornerRadius="20"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource White}"
+                            Clicked="OnSelectionCloseClicked" />
+                    <Label x:Name="SelCountLabel"
+                           Grid.Column="1"
+                           VerticalOptions="Center"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource White}"
+                           LineBreakMode="TailTruncation" />
+                    <Button x:Name="SelectAllButton"
+                            Grid.Column="2"
+                            FontSize="13"
+                            HeightRequest="40"
+                            Padding="10,0"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource White}"
+                            Clicked="OnSelectAllClicked" />
+                    <Button x:Name="SelActionsButton"
+                            Grid.Column="3"
+                            Text="⋮"
+                            FontSize="20"
+                            FontAttributes="Bold"
+                            HeightRequest="40"
+                            Padding="14,0"
+                            CornerRadius="8"
+                            BackgroundColor="{StaticResource White}"
+                            TextColor="{StaticResource PrimaryDark}"
+                            Clicked="OnBatchActionsClicked" />
+                </Grid>
+            </Border>
 
             <!-- Carpeta vacia / sin resultados -->
             <VerticalStackLayout x:Name="EmptyView"
@@ -170,24 +273,22 @@
                                HorizontalOptions="Center" />
 
             <!-- Boton flotante: nueva carpeta -->
-            <Button x:Name="NewFolderButton"
-                    Text="+"
-                    FontSize="28"
-                    FontAttributes="Bold"
+            <ImageButton x:Name="NewFolderButton"
+                    Source="ic_add.png"
+                    Aspect="AspectFit"
+                    Padding="16"
                     WidthRequest="58"
                     HeightRequest="58"
                     CornerRadius="29"
-                    Padding="0"
                     Margin="0,0,18,18"
                     BackgroundColor="{StaticResource Primary}"
-                    TextColor="{StaticResource White}"
                     HorizontalOptions="End"
                     VerticalOptions="End"
                     Clicked="OnNewFolderClicked">
-                <Button.Shadow>
+                <ImageButton.Shadow>
                     <Shadow Brush="{StaticResource Black}" Opacity="0.3" Radius="10" Offset="0,4" />
-                </Button.Shadow>
-            </Button>
+                </ImageButton.Shadow>
+            </ImageButton>
 
             <!-- Barra de pegado: solo visible con el portapapeles lleno -->
             <Border x:Name="PasteBar"
@@ -210,7 +311,7 @@
                     <Button x:Name="PasteCancelButton"
                             Grid.Column="1"
                             BackgroundColor="Transparent"
-                            TextColor="#CFE0F0"
+                            TextColor="{StaticResource SubtitleOnPrimary}"
                             FontSize="14"
                             HeightRequest="40"
                             Clicked="OnCancelPasteClicked" />

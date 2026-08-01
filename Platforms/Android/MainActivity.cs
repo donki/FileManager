@@ -30,7 +30,7 @@ public class MainActivity : MauiAppCompatActivity
         if (content is null)
             return;
 
-        content.SetBackgroundColor(global::Android.Graphics.Color.ParseColor("#1E5C97"));
+        content.SetBackgroundColor(global::Android.Graphics.Color.ParseColor("#2A1CB8"));
 
         ViewCompat.SetOnApplyWindowInsetsListener(content, new SystemBarInsetsListener());
 

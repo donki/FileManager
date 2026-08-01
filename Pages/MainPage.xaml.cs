@@ -15,9 +15,19 @@ public partial class MainPage : ContentPage
     private readonly ILocalizationService _l;
     private readonly IStoragePermissionService _permissions;
     private readonly IToastService _toast;
+    private readonly UpdateService _update;
     private readonly ILogger<MainPage> _logger;
 
     private readonly ObservableCollection<FileItem> _items = new();
+
+    /// <summary>Lista completa cargada de la carpeta (sin filtrar). `_items` es su vista filtrada.</summary>
+    private readonly List<FileItem> _allItems = new();
+
+    /// <summary>Filtro por tipo activo (null = todos).</summary>
+    private FileCategory? _typeFilter;
+
+    /// <summary>Modo de selección múltiple activo (operaciones en lote).</summary>
+    private bool _selectMode;
 
     private string _currentPath = string.Empty;
     private bool _searchActive;
@@ -34,6 +44,7 @@ public partial class MainPage : ContentPage
         ILocalizationService localization,
         IStoragePermissionService permissions,
         IToastService toast,
+        UpdateService update,
         ILogger<MainPage> logger)
     {
         InitializeComponent();
@@ -45,6 +56,7 @@ public partial class MainPage : ContentPage
         _l = localization;
         _permissions = permissions;
         _toast = toast;
+        _update = update;
         _logger = logger;
 
         FilesView.ItemsSource = _items;
@@ -69,6 +81,10 @@ public partial class MainPage : ContentPage
 
         ApplyTexts();
         UpdatePasteBar();
+
+        // Comprobacion de version al arrancar (constitucion 15): no bloqueante y silenciosa si ya
+        // se esta al dia. El propio servicio solo comprueba una vez por sesion.
+        _ = _update.CheckAndPromptAsync(this);
 
         await RefreshAccessAsync();
     }
@@ -134,6 +150,7 @@ public partial class MainPage : ContentPage
         PermissionButton.Text = _l["PermissionGrant"];
         PasteConfirmButton.Text = _l["Paste"];
         PasteCancelButton.Text = _l["Cancel"];
+        SelectAllButton.Text = _l["SelectAll"];
 
         UpdateHeader();
     }
@@ -144,12 +161,16 @@ public partial class MainPage : ContentPage
         TitleLabel.Text = isRoot ? _l["InternalStorage"] : Path.GetFileName(_currentPath);
         UpButton.IsVisible = !isRoot;
 
-        SubtitleLabel.Text = _items.Count switch
+        var count = _items.Count switch
         {
             0 => string.Empty,
             1 => _l["OneItem"],
             _ => string.Format(_l.CurrentCulture, _l["ItemsCount"], _items.Count)
         };
+        // Si hay filtro por tipo activo, se indica en el subtítulo.
+        SubtitleLabel.Text = _typeFilter is null
+            ? count
+            : (string.IsNullOrEmpty(count) ? FilterName(_typeFilter) : $"{count}  ·  {FilterName(_typeFilter)}");
     }
 
     // ============ Permisos ============
@@ -174,7 +195,7 @@ public partial class MainPage : ContentPage
         {
             _awaitingPermission = false;
             _logger.LogError(ex, "Could not open the storage permission settings");
-            await DisplayAlert(_l["Error"], ex.Message, _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], ex.Message, _l["Ok"]);
         }
     }
 
@@ -199,13 +220,13 @@ public partial class MainPage : ContentPage
         }
         catch (UnauthorizedAccessException)
         {
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorAccessDenied"], path), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorAccessDenied"], path), _l["Ok"]);
             await NavigateUpIfPossible();
         }
         catch (Exception ex) when (ex is IOException)
         {
             _logger.LogError(ex, "Could not list the folder");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorReadFolder"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorReadFolder"], ex.Message), _l["Ok"]);
         }
         finally
         {
@@ -215,20 +236,25 @@ public partial class MainPage : ContentPage
 
     private void Populate(IReadOnlyList<FileItem> items, bool isSearch)
     {
-        _items.Clear();
+        // Cambiar de carpeta/lista sale del modo selección.
+        if (_selectMode)
+            ExitSelectionMode();
 
+        _allItems.Clear();
         foreach (var item in items)
         {
             item.Icon = FileIcons.For(item);
             item.Details = DescribeItem(item);
-            _items.Add(item);
+            item.IsSelected = false;
+            _allItems.Add(item);
         }
 
         FilesView.IsVisible = true;
         PermissionView.IsVisible = false;
         NewFolderButton.IsVisible = !isSearch;
 
-        EmptyView.IsVisible = _items.Count == 0;
+        ApplyFilterAndShow();
+
         EmptyIconLabel.Text = isSearch ? "🔍" : "📂";
         EmptyTitleLabel.Text = isSearch ? _l["NoSearchResults"] : _l["EmptyFolder"];
         EmptyHintLabel.IsVisible = !isSearch;
@@ -236,6 +262,57 @@ public partial class MainPage : ContentPage
         BuildBreadcrumb();
         UpdateHeader();
         UpdatePasteBar();
+    }
+
+    /// <summary>Rellena <see cref="_items"/> desde <see cref="_allItems"/> aplicando el filtro por
+    /// tipo. Las CARPETAS se muestran siempre (para poder seguir navegando aunque haya filtro).</summary>
+    private void ApplyFilterAndShow()
+    {
+        _items.Clear();
+        foreach (var item in _allItems)
+        {
+            if (_typeFilter is null || item.IsDirectory || item.Category == _typeFilter)
+                _items.Add(item);
+        }
+        EmptyView.IsVisible = _items.Count == 0;
+    }
+
+    /// <summary>Nombre localizado de una categoría de tipo (para el menú y el subtítulo).</summary>
+    private string FilterName(FileCategory? category) => category switch
+    {
+        null => _l["FilterAll"],
+        FileCategory.Image => _l["FilterImages"],
+        FileCategory.Video => _l["FilterVideo"],
+        FileCategory.Audio => _l["FilterAudio"],
+        FileCategory.Document => _l["FilterDocuments"],
+        FileCategory.Apk => _l["FilterApk"],
+        FileCategory.Archive => _l["FilterArchives"],
+        _ => _l["FilterOther"]
+    };
+
+    private async Task ShowFilterMenuAsync()
+    {
+        var options = new (string Label, FileCategory? Cat)[]
+        {
+            (_l["FilterAll"], null),
+            (_l["FilterImages"], FileCategory.Image),
+            (_l["FilterVideo"], FileCategory.Video),
+            (_l["FilterAudio"], FileCategory.Audio),
+            (_l["FilterDocuments"], FileCategory.Document),
+            (_l["FilterApk"], FileCategory.Apk),
+            (_l["FilterArchives"], FileCategory.Archive),
+            (_l["FilterOther"], FileCategory.Other),
+        };
+
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this, _l["Filter"], _l["Cancel"],
+            options.Select(o => o.Label).ToArray());
+        if (choice is null || choice == _l["Cancel"])
+            return;
+
+        var picked = options.FirstOrDefault(o => o.Label == choice);
+        _typeFilter = picked.Cat;
+        ApplyFilterAndShow();
+        UpdateHeader();
     }
 
     /// <summary>Linea secundaria de cada fila: fecha y, para ficheros, tamano.</summary>
@@ -330,6 +407,13 @@ public partial class MainPage : ContentPage
             await BreadcrumbScroll.ScrollToAsync(BreadcrumbBar, ScrollToPosition.End, false));
     }
 
+    private void OnMenuClicked(object? sender, EventArgs e)
+    {
+        // Abre el menu hamburguesa (flyout de Shell): navegacion de primer nivel (constitucion A.9).
+        if (Shell.Current is not null)
+            Shell.Current.FlyoutIsPresented = true;
+    }
+
     private async void OnUpClicked(object? sender, EventArgs e) => await NavigateUpIfPossible();
 
     private async Task<bool> NavigateUpIfPossible()
@@ -354,6 +438,13 @@ public partial class MainPage : ContentPage
 
     protected override bool OnBackButtonPressed()
     {
+        // En modo selección, el botón atrás sale de la selección.
+        if (_selectMode)
+        {
+            Dispatcher.Dispatch(ExitSelectionMode);
+            return true;
+        }
+
         // El boton atras de Android sube una carpeta en lugar de cerrar la aplicacion.
         if (_searchActive || !IsRoot(_currentPath))
         {
@@ -364,10 +455,59 @@ public partial class MainPage : ContentPage
         return base.OnBackButtonPressed();
     }
 
+    // --- Pulsación larga: inicia el modo selección y marca el elemento ---
+    private IDispatcherTimer? _longPressTimer;
+    private FileItem? _pressItem;
+    private bool _longPressFired;
+
+    private void OnItemPressed(object? sender, PointerEventArgs e)
+    {
+        if ((sender as BindableObject)?.BindingContext is not FileItem item)
+            return;
+        _pressItem = item;
+        _longPressTimer?.Stop();
+        _longPressTimer = Dispatcher.CreateTimer();
+        _longPressTimer.Interval = TimeSpan.FromMilliseconds(450);
+        _longPressTimer.IsRepeating = false;
+        _longPressTimer.Tick += (_, _) =>
+        {
+            _longPressTimer?.Stop();
+            if (_pressItem is null)
+                return;
+            _longPressFired = true;                 // evita que el "tap" de soltar desmarque
+            if (!_selectMode)
+                EnterSelectionMode();
+            _pressItem.IsSelected = true;
+            UpdateSelectionCount();
+        };
+        _longPressTimer.Start();
+    }
+
+    private void OnItemReleased(object? sender, PointerEventArgs e)
+    {
+        _longPressTimer?.Stop();
+        _pressItem = null;
+    }
+
     private async void OnItemTapped(object? sender, TappedEventArgs e)
     {
         if ((sender as BindableObject)?.BindingContext is not FileItem item)
             return;
+
+        // Si acaba de dispararse una pulsación larga, ignora el tap que llega al soltar.
+        if (_longPressFired)
+        {
+            _longPressFired = false;
+            return;
+        }
+
+        // En modo selección, tocar una fila la marca/desmarca (no abre).
+        if (_selectMode)
+        {
+            item.IsSelected = !item.IsSelected;
+            UpdateSelectionCount();
+            return;
+        }
 
         if (item.IsDirectory)
         {
@@ -386,12 +526,12 @@ public partial class MainPage : ContentPage
         try
         {
             if (!await _actions.OpenAsync(item.FullPath))
-                await DisplayAlert(_l["Error"], _l["ErrorNoAppForFile"], _l["Ok"]);
+                await SocShared.ModernDialog.AlertAsync(this, _l["Error"], _l["ErrorNoAppForFile"], _l["Ok"]);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not open the file");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorOpenFile"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorOpenFile"], ex.Message), _l["Ok"]);
         }
     }
 
@@ -452,7 +592,7 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Search failed");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorSearch"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorSearch"], ex.Message), _l["Ok"]);
         }
         finally
         {
@@ -469,12 +609,18 @@ public partial class MainPage : ContentPage
             return;
 
         var options = item.IsDirectory
-            ? new[] { _l["Open"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] }
-            : new[] { _l["Open"], _l["Share"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] };
+            ? new[] { _l["Select"], _l["Open"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] }
+            : new[] { _l["Select"], _l["Open"], _l["Share"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] };
 
-        var choice = await DisplayActionSheet(item.Name, _l["Cancel"], null, options);
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this, item.Name, _l["Cancel"], options);
 
-        if (choice == _l["Open"])
+        if (choice == _l["Select"])
+        {
+            EnterSelectionMode();
+            item.IsSelected = true;
+            UpdateSelectionCount();
+        }
+        else if (choice == _l["Open"])
         {
             if (item.IsDirectory)
                 await LoadAsync(item.FullPath);
@@ -518,19 +664,19 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not share the file");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorShare"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorShare"], ex.Message), _l["Ok"]);
         }
     }
 
     private async Task RenameAsync(FileItem item)
     {
-        var name = await DisplayPromptAsync(
+        var name = await SocShared.ModernDialog.PromptAsync(
+            this,
             _l["RenameTitle"],
             _l["RenamePrompt"],
             accept: _l["Save"],
             cancel: _l["Cancel"],
-            initialValue: item.Name,
-            maxLength: 255);
+            initialValue: item.Name);
 
         if (name is null)
             return;
@@ -551,7 +697,7 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Rename failed");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorRename"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorRename"], ex.Message), _l["Ok"]);
         }
     }
 
@@ -577,7 +723,7 @@ public partial class MainPage : ContentPage
             lines.Add($"{_l["DetailsSize"]}: {SizeFormatter.Format(item.Size, culture)}");
         }
 
-        await DisplayAlert(_l["Details"], string.Join("\n\n", lines), _l["Close"]);
+        await SocShared.ModernDialog.AlertAsync(this, _l["Details"], string.Join("\n\n", lines), _l["Close"]);
     }
 
     private string DescribeFileType(FileItem item) =>
@@ -594,7 +740,7 @@ public partial class MainPage : ContentPage
                 item.IsDirectory ? _l["DeleteFolderConfirm"] : _l["DeleteFileConfirm"],
                 item.Name);
 
-            if (!await DisplayAlert(_l["DeleteTitle"], message, _l["Delete"], _l["Cancel"]))
+            if (!await SocShared.ModernDialog.AlertAsync(this, _l["DeleteTitle"], message, _l["Delete"], _l["Cancel"]))
                 return;
         }
 
@@ -605,7 +751,110 @@ public partial class MainPage : ContentPage
             await LoadAsync(_currentPath);
 
             if (result.HasErrors)
-                await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorDelete"], string.Join("\n", result.Errors)), _l["Ok"]);
+                await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorDelete"], string.Join("\n", result.Errors)), _l["Ok"]);
+            else
+                _toast.Show(string.Format(_l.CurrentCulture, _l["Deleted"], result.Succeeded));
+        }
+        finally
+        {
+            SetBusy(false);
+        }
+    }
+
+    // ============ Selección múltiple / operaciones en lote ============
+
+    private void EnterSelectionMode()
+    {
+        if (_selectMode)
+            return;
+        if (_searchActive)
+            ExitSearch();
+        _selectMode = true;
+        SelectionBar.IsVisible = true;
+        SearchButton.IsVisible = false;
+        NewFolderButton.IsVisible = false;
+        PasteBar.IsVisible = false;
+        UpdateSelectionCount();
+    }
+
+    private void ExitSelectionMode()
+    {
+        _selectMode = false;
+        foreach (var it in _allItems)
+            it.IsSelected = false;
+        SelectionBar.IsVisible = false;
+        SearchButton.IsVisible = true;
+        NewFolderButton.IsVisible = !_searchActive;
+        UpdatePasteBar();
+    }
+
+    private List<FileItem> SelectedItems() => _items.Where(i => i.IsSelected).ToList();
+
+    private void UpdateSelectionCount()
+    {
+        var n = _items.Count(i => i.IsSelected);
+        SelCountLabel.Text = string.Format(_l.CurrentCulture, _l["SelectedCount"], n);
+    }
+
+    private void OnSelectionCloseClicked(object? sender, EventArgs e) => ExitSelectionMode();
+
+    private void OnSelectAllClicked(object? sender, EventArgs e)
+    {
+        var visible = _items.ToList();
+        var allSelected = visible.Count > 0 && visible.All(i => i.IsSelected);
+        foreach (var it in visible)
+            it.IsSelected = !allSelected;
+        UpdateSelectionCount();
+    }
+
+    private async void OnBatchActionsClicked(object? sender, EventArgs e)
+    {
+        var selected = SelectedItems();
+        if (selected.Count == 0)
+        {
+            _toast.Show(_l["NothingSelected"]);
+            return;
+        }
+
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this,
+            string.Format(_l.CurrentCulture, _l["SelectedCount"], selected.Count),
+            _l["Cancel"],
+            _l["Copy"], _l["Cut"], _l["Delete"]);
+
+        if (choice == _l["Copy"])
+        {
+            _clipboard.Set(selected.Select(i => i.FullPath).ToArray(), isMove: false);
+            ExitSelectionMode();
+        }
+        else if (choice == _l["Cut"])
+        {
+            _clipboard.Set(selected.Select(i => i.FullPath).ToArray(), isMove: true);
+            ExitSelectionMode();
+        }
+        else if (choice == _l["Delete"])
+        {
+            await BatchDeleteAsync(selected);
+        }
+    }
+
+    private async Task BatchDeleteAsync(IReadOnlyList<FileItem> selected)
+    {
+        if (_settings.ConfirmDelete)
+        {
+            var message = string.Format(_l.CurrentCulture, _l["DeleteManyConfirm"], selected.Count);
+            if (!await SocShared.ModernDialog.AlertAsync(this, _l["DeleteTitle"], message, _l["Delete"], _l["Cancel"]))
+                return;
+        }
+
+        SetBusy(true);
+        try
+        {
+            var result = await _files.DeleteAsync(selected.Select(i => i.FullPath).ToArray());
+            ExitSelectionMode();
+            await LoadAsync(_currentPath);
+
+            if (result.HasErrors)
+                await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorDelete"], string.Join("\n", result.Errors)), _l["Ok"]);
             else
                 _toast.Show(string.Format(_l.CurrentCulture, _l["Deleted"], result.Succeeded));
         }
@@ -619,12 +868,12 @@ public partial class MainPage : ContentPage
 
     private async void OnNewFolderClicked(object? sender, EventArgs e)
     {
-        var name = await DisplayPromptAsync(
+        var name = await SocShared.ModernDialog.PromptAsync(
+            this,
             _l["NewFolderTitle"],
             _l["NewFolderPrompt"],
             accept: _l["Save"],
-            cancel: _l["Cancel"],
-            maxLength: 255);
+            cancel: _l["Cancel"]);
 
         if (name is null)
             return;
@@ -641,7 +890,7 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not create the folder");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorCreateFolder"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorCreateFolder"], ex.Message), _l["Ok"]);
         }
     }
 
@@ -658,7 +907,7 @@ public partial class MainPage : ContentPage
             _ => _l["ErrorNameExists"]
         };
 
-        await DisplayAlert(_l["Error"], message, _l["Ok"]);
+        await SocShared.ModernDialog.AlertAsync(this, _l["Error"], message, _l["Ok"]);
         return false;
     }
 
@@ -695,7 +944,7 @@ public partial class MainPage : ContentPage
         var selfPaste = entry.Paths.FirstOrDefault(p => Directory.Exists(p) && _files.IsInside(p, _currentPath));
         if (selfPaste is not null)
         {
-            await DisplayAlert(_l["Error"], _l["ErrorPasteIntoItself"], _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], _l["ErrorPasteIntoItself"], _l["Ok"]);
             return;
         }
 
@@ -704,10 +953,9 @@ public partial class MainPage : ContentPage
 
         if (conflicts.Count > 0)
         {
-            var answer = await DisplayActionSheet(
+            var answer = await SocShared.ModernDialog.ActionSheetAsync(this,
                 string.Format(_l.CurrentCulture, _l["OverwriteConfirm"], string.Join(", ", conflicts)),
                 _l["Cancel"],
-                null,
                 _l["Replace"], _l["KeepBoth"]);
 
             if (answer == _l["Replace"])
@@ -729,7 +977,7 @@ public partial class MainPage : ContentPage
 
             if (result.HasErrors)
             {
-                await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorPaste"], string.Join("\n", result.Errors)), _l["Ok"]);
+                await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorPaste"], string.Join("\n", result.Errors)), _l["Ok"]);
             }
             else
             {
@@ -740,7 +988,7 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError(ex, "Paste failed");
-            await DisplayAlert(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorPaste"], ex.Message), _l["Ok"]);
+            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], string.Format(_l.CurrentCulture, _l["ErrorPaste"], ex.Message), _l["Ok"]);
         }
         finally
         {
@@ -753,13 +1001,20 @@ public partial class MainPage : ContentPage
     private async void OnMoreClicked(object? sender, EventArgs e)
     {
         var hidden = _settings.ShowHiddenFiles ? _l["ShowHiddenOff"] : _l["ShowHiddenOn"];
-        var choice = await DisplayActionSheet(
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this,
             _l["More"],
             _l["Cancel"],
-            null,
-            _l["Sort"], hidden, _l["Refresh"], _l["Settings"], _l["About"]);
+            _l["Select"], _l["Filter"], _l["Sort"], hidden, _l["Refresh"], _l["Settings"], _l["About"]);
 
-        if (choice == _l["Sort"])
+        if (choice == _l["Select"])
+        {
+            EnterSelectionMode();
+        }
+        else if (choice == _l["Filter"])
+        {
+            await ShowFilterMenuAsync();
+        }
+        else if (choice == _l["Sort"])
         {
             await ShowSortMenuAsync();
         }
@@ -794,7 +1049,7 @@ public partial class MainPage : ContentPage
             [_l["SortSizeAsc"]] = SortMode.SizeAscending
         };
 
-        var choice = await DisplayActionSheet(_l["Sort"], _l["Cancel"], null, options.Keys.ToArray());
+        var choice = await SocShared.ModernDialog.ActionSheetAsync(this, _l["Sort"], _l["Cancel"], options.Keys.ToArray());
 
         if (choice is not null && options.TryGetValue(choice, out var mode))
         {
