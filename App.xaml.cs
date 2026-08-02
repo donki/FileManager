@@ -13,6 +13,10 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState? activationState)
     {
         var root = new NavigationPage(ServiceHelper.GetRequiredService<MainPage>());
-        return new Window(root);
+        var window = new Window(root);
+#if DEBUG
+        SocShared.AuthorNotes.Attach(window);   // notas de autor: SOLO Debug, desactivado en Release/produccion
+#endif
+        return window;
     }
 }
