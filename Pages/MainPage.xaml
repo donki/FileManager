@@ -7,7 +7,7 @@
              Shell.NavBarIsVisible="False"
              NavigationPage.HasNavigationBar="False">
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*">
 
         <!-- ============ Barra superior ============ -->
         <VerticalStackLayout Grid.Row="0" BackgroundColor="{StaticResource Primary}" Spacing="0">
@@ -93,8 +93,61 @@
 
         </VerticalStackLayout>
 
+        <!-- Barra contextual de seleccion multiple. Ocupa su propia fila: superpuesta sobre la
+             lista tapaba justo el primer elemento, que suele ser el que se acaba de marcar. -->
+        <Border x:Name="SelectionBar"
+                Grid.Row="1"
+                IsVisible="False"
+                Margin="8,8,8,0"
+                Padding="6,4"
+                BackgroundColor="{StaticResource PrimaryDark}"
+                StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="4" VerticalOptions="Center">
+                <Button x:Name="SelCloseButton"
+                        Grid.Column="0"
+                        Text="✕"
+                        FontSize="18"
+                        WidthRequest="40"
+                        HeightRequest="40"
+                        Padding="0"
+                        CornerRadius="20"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource White}"
+                        Clicked="OnSelectionCloseClicked" />
+                <Label x:Name="SelCountLabel"
+                       Grid.Column="1"
+                       VerticalOptions="Center"
+                       FontSize="15"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource White}"
+                       LineBreakMode="TailTruncation" />
+                <Button x:Name="SelectAllButton"
+                        Grid.Column="2"
+                        FontSize="13"
+                        HeightRequest="40"
+                        Padding="10,0"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource White}"
+                        Clicked="OnSelectAllClicked" />
+                <Button x:Name="SelActionsButton"
+                        Grid.Column="3"
+                        Text="⋮"
+                        FontSize="20"
+                        FontAttributes="Bold"
+                        HeightRequest="40"
+                        Padding="14,0"
+                        CornerRadius="8"
+                        BackgroundColor="{StaticResource White}"
+                        TextColor="{StaticResource PrimaryDark}"
+                        Clicked="OnBatchActionsClicked" />
+            </Grid>
+        </Border>
+
         <!-- ============ Contenido ============ -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
 
             <CollectionView x:Name="FilesView"
                             SelectionMode="None"
@@ -180,57 +233,6 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <!-- Barra contextual de selección múltiple (arriba) -->
-            <Border x:Name="SelectionBar"
-                    IsVisible="False"
-                    VerticalOptions="Start"
-                    Margin="8,8"
-                    Padding="6,4"
-                    BackgroundColor="{StaticResource PrimaryDark}"
-                    StrokeThickness="0">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12" />
-                </Border.StrokeShape>
-                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="4" VerticalOptions="Center">
-                    <Button x:Name="SelCloseButton"
-                            Grid.Column="0"
-                            Text="✕"
-                            FontSize="18"
-                            WidthRequest="40"
-                            HeightRequest="40"
-                            Padding="0"
-                            CornerRadius="20"
-                            BackgroundColor="Transparent"
-                            TextColor="{StaticResource White}"
-                            Clicked="OnSelectionCloseClicked" />
-                    <Label x:Name="SelCountLabel"
-                           Grid.Column="1"
-                           VerticalOptions="Center"
-                           FontSize="15"
-                           FontAttributes="Bold"
-                           TextColor="{StaticResource White}"
-                           LineBreakMode="TailTruncation" />
-                    <Button x:Name="SelectAllButton"
-                            Grid.Column="2"
-                            FontSize="13"
-                            HeightRequest="40"
-                            Padding="10,0"
-                            BackgroundColor="Transparent"
-                            TextColor="{StaticResource White}"
-                            Clicked="OnSelectAllClicked" />
-                    <Button x:Name="SelActionsButton"
-                            Grid.Column="3"
-                            Text="⋮"
-                            FontSize="20"
-                            FontAttributes="Bold"
-                            HeightRequest="40"
-                            Padding="14,0"
-                            CornerRadius="8"
-                            BackgroundColor="{StaticResource White}"
-                            TextColor="{StaticResource PrimaryDark}"
-                            Clicked="OnBatchActionsClicked" />
-                </Grid>
-            </Border>
 
             <!-- Carpeta vacia / sin resultados -->
             <VerticalStackLayout x:Name="EmptyView"
