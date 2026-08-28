@@ -4,6 +4,16 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.08.28.0] — 2026-08-28
+
+`versionCode`: 202608280
+
+### Corregido
+- La **barra de selección múltiple ya no tapa el primer elemento**. Estaba superpuesta sobre la
+  lista (`VerticalOptions="Start"` dentro del mismo `Grid`), justo encima de la primera fila, que
+  suele ser la que se acaba de marcar con la pulsación larga. Ahora ocupa su propia fila del
+  `Grid` de la página y empuja la lista hacia abajo.
+
 ## [2026.08.01.0] — 2026-08-01
 
 `versionCode`: 202608010
