@@ -11,6 +11,11 @@ clonar el proyecto con ella:
 git clone --recurse-submodules https://github.com/donki/FileManager.git
 ```
 
+## Dónde conseguirla
+
+- **Google Play:** https://play.google.com/store/apps/details?id=com.socratic.filemanager
+- **Releases de GitHub** (APK / EXE / MSIX de cada versión): https://github.com/donki/FileManager/releases
+
 ## ✨ Características
 
 ### 📂 Exploración
