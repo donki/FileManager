@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="FileManager.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:mauiControls="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
+    Shell.FlyoutBehavior="Flyout"
+    Title="File Manager"
+    FlyoutWidth="260"
+    Shell.BackgroundColor="{StaticResource Primary}"
+    Shell.ForegroundColor="{StaticResource White}"
+    Shell.TitleColor="{StaticResource White}"
+    FlyoutBackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource PageBackgroundDark}}">
+
+    <!-- Plantilla de los items del menu: el texto toma color segun el tema con tokens
+         (A.9); nunca un color fijo que quede invisible en modo oscuro. -->
+    <Shell.ItemTemplate>
+        <DataTemplate x:DataType="mauiControls:BaseShellItem">
+            <Grid MinimumHeightRequest="52" Padding="20,12" ColumnDefinitions="24,*" ColumnSpacing="16">
+                <Image Grid.Column="0"
+                       Source="{Binding FlyoutIcon}"
+                       HeightRequest="22"
+                       WidthRequest="22"
+                       Aspect="AspectFit"
+                       VerticalOptions="Center" />
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       VerticalOptions="Center"
+                       FontSize="16"
+                       LineBreakMode="WordWrap"
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <!-- Cabecera del menu -->
+    <Shell.FlyoutHeader>
+        <Grid BackgroundColor="{StaticResource Primary}" MinimumHeightRequest="140" Padding="20,44,20,16">
+            <VerticalStackLayout VerticalOptions="End" Spacing="4">
+                <Image Source="menu_logo.png" WidthRequest="52" HeightRequest="52" HorizontalOptions="Start" />
+                <Label Text="File Manager" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource White}" />
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <!-- Menu hamburguesa (A.9): Inicio, Configuracion y Acerca de. Las paginas piden servicios por
+         constructor, asi que el contenido de cada item lo pone el code-behind desde el contenedor. -->
+    <FlyoutItem x:Name="HomeFlyoutItem" Title="Home" FlyoutIcon="ic_home.png">
+        <ShellContent x:Name="HomeContent" Route="MainPage" />
+    </FlyoutItem>
+
+    <FlyoutItem x:Name="SettingsFlyoutItem" Title="Settings" FlyoutIcon="ic_settings.png">
+        <ShellContent x:Name="SettingsContent" Route="SettingsPage" />
+    </FlyoutItem>
+
+    <FlyoutItem x:Name="AboutFlyoutItem" Title="About" FlyoutIcon="ic_info.png">
+        <ShellContent x:Name="AboutContent" Route="AboutPage" />
+    </FlyoutItem>
+
+    <!-- Pie del menú con la versión -->
+    <Shell.FlyoutFooter>
+        <Grid Padding="20,12">
+            <!-- La versión se toma de AppInfo en el code-behind: escrita a mano se quedaba vieja. -->
+            <Label x:Name="VersionLabel"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center" />
+        </Grid>
+    </Shell.FlyoutFooter>
+
+</Shell>

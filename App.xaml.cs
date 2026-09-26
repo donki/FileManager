@@ -12,8 +12,9 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        var root = new NavigationPage(ServiceHelper.GetRequiredService<MainPage>());
-        var window = new Window(root);
+        // Shell con menú hamburguesa (A.9); dentro, Configuración y Acerca de se siguen apilando
+        // desde el menú «⋮» de la pantalla principal.
+        var window = new Window(new AppShell());
 #if DEBUG
         SocShared.AuthorNotes.Attach(window);   // notas de autor: SOLO Debug, desactivado en Release/produccion
 #endif

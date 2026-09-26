@@ -4,6 +4,14 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.09.26.0] — 2026-09-26
+
+### Corregido
+- El botón de menú de la barra superior no abría nada: la aplicación arrancaba con un
+  `NavigationPage` y no había menú lateral. Ahora arranca con un Shell con **menú hamburguesa**
+  (constitución A.9): **Inicio**, **Configuración** y **Acerca de**, con la versión al pie. El menú
+  «⋮» sigue abriendo Configuración y Acerca de como antes.
+
 ## [2026.08.28.0] — 2026-08-28
 
 `versionCode`: 202608280
