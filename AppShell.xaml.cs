@@ -25,6 +25,21 @@ public partial class AppShell : Shell
         UpdateMenuTexts();
     }
 
+    /// <summary>
+    /// Atrás (Mobile §7): con una página apilada (desde el menú «⋮»), la desapila el Shell; en
+    /// Configuración o Acerca de abiertas desde el menú lateral vuelve a Inicio; en Inicio decide la
+    /// propia página (sube de carpeta) y, en la raíz, la aplicación se oculta.
+    /// </summary>
+    protected override bool OnBackButtonPressed()
+    {
+        if (CurrentItem != HomeFlyoutItem && Navigation.NavigationStack.Count <= 1)
+        {
+            CurrentItem = HomeFlyoutItem;
+            return true;
+        }
+        return base.OnBackButtonPressed();
+    }
+
     private void UpdateMenuTexts()
     {
         HomeFlyoutItem.Title = _l["Home"];

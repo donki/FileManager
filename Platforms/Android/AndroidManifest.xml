@@ -2,11 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
+  <!--
+    enableOnBackInvokedCallback="false": con targetSdk 36, Android 16 activa el «atras predictivo»
+    y el boton de atras deja de llegar a Page.OnBackButtonPressed: desde una subcarpeta salia de la
+    aplicacion en vez de subir (Xiaomi, 2026-09-26). En el emulador con Android 14 no pasaba.
+  -->
   <application android:allowBackup="true"
                android:icon="@mipmap/appicon"
                android:roundIcon="@mipmap/appicon_round"
                android:supportsRtl="true"
-               android:requestLegacyExternalStorage="true" />
+               android:requestLegacyExternalStorage="true"
+               android:enableOnBackInvokedCallback="false" />
 
   <!--
     Permisos (constitucion 5: justificar cada permiso).

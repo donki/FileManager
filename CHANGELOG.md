@@ -10,7 +10,13 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - El botón de menú de la barra superior no abría nada: la aplicación arrancaba con un
   `NavigationPage` y no había menú lateral. Ahora arranca con un Shell con **menú hamburguesa**
   (constitución A.9): **Inicio**, **Configuración** y **Acerca de**, con la versión al pie. El menú
-  «⋮» sigue abriendo Configuración y Acerca de como antes.
+  «⋮» sigue abriendo Configuración y Acerca de como antes. La cabecera del menú se desplaza con
+  la lista: con el móvil en horizontal y la letra grande tapaba «Acerca de».
+- En Android 16 el botón de atrás salía de la aplicación desde una subcarpeta: con targetSdk 36
+  entra el «atrás predictivo» y el botón no llegaba a la página. Se desactiva
+  (`enableOnBackInvokedCallback="false"`) y vuelve a subir de carpeta.
+- Atrás en Configuración o Acerca de abiertas desde el menú lateral vuelve a Inicio; en la raíz
+  de Inicio, la aplicación se oculta (Mobile §7). Probado en el Xiaomi con la letra al 145 %.
 
 ## [2026.08.28.0] — 2026-08-28
 

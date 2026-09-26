@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:mauiControls="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
     Shell.FlyoutBehavior="Flyout"
+    FlyoutHeaderBehavior="Scroll"
     Title="File Manager"
     FlyoutWidth="260"
     Shell.BackgroundColor="{StaticResource Primary}"
@@ -33,9 +34,10 @@
         </DataTemplate>
     </Shell.ItemTemplate>
 
-    <!-- Cabecera del menu -->
+    <!-- Cabecera del menu. Se desplaza con la lista (FlyoutHeaderBehavior="Scroll") y sin altura
+         minima: con el movil en horizontal y la letra grande, fija y alta tapaba «Acerca de». -->
     <Shell.FlyoutHeader>
-        <Grid BackgroundColor="{StaticResource Primary}" MinimumHeightRequest="140" Padding="20,44,20,16">
+        <Grid BackgroundColor="{StaticResource Primary}" Padding="20,24,20,16">
             <VerticalStackLayout VerticalOptions="End" Spacing="4">
                 <Image Source="menu_logo.png" WidthRequest="52" HeightRequest="52" HorizontalOptions="Start" />
                 <Label Text="File Manager" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource White}" />
