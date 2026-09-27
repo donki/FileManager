@@ -36,22 +36,22 @@ public partial class AboutPage : ContentPage
         DescriptionLabel.Text = _l["AppDescription"];
         CompanyLabel.Text = _l["Company"];
 
-        ContactTitle.Text = $"📧 {_l["AboutContact"]}";
+        ContactTitle.Text = _l["AboutContact"];
         ContactButton.Text = ContactEmail;
         ContactHint.Text = _l["AboutContactHint"];
 
-        PrivacyTitle.Text = $"🔒 {_l["AboutPrivacy"]}";
+        PrivacyTitle.Text = _l["AboutPrivacy"];
         PrivacyText.Text = _l["AboutPrivacyText"];
 
-        LicenseTitle.Text = $"📄 {_l["AboutLicense"]}";
+        LicenseTitle.Text = _l["AboutLicense"];
         LicenseText.Text = _l["AboutLicenseText"];
 
 
-        LanguageTitle.Text = $"🌐 {_l["SettingsLanguage"]}";
+        LanguageTitle.Text = _l["SettingsLanguage"];
         LanguageHint.Text = _l["AboutLanguageHint"];
         UpdateLanguageButtons();
 
-        LegalTitle.Text = $"⚖️ {_l["AboutLegal"]}";
+        LegalTitle.Text = _l["AboutLegal"];
         LegalText1.Text = _l["AboutLegal1"];
         LegalText2.Text = _l["AboutLegal2"];
         WarningText.Text = _l["AboutWarning"];
@@ -65,10 +65,10 @@ public partial class AboutPage : ContentPage
     {
         var isSpanish = _l.CurrentLanguage == "es";
 
-        // El nombre del idioma se resuelve por localizacion (constitucion 8); la bandera es un
-        // glifo decorativo (indicador regional) y se antepone como tal.
-        SpanishButton.Text = $"🇪🇸 {_l["SettingsLanguageSpanish"]}";
-        EnglishButton.Text = $"🇺🇸 {_l["SettingsLanguageEnglish"]}";
+        // El nombre del idioma se resuelve por localizacion (constitucion 8); la bandera es el icono
+        // dibujado del boton (ic_flag_*.svg en el XAML), nunca emoji (General 6.2).
+        SpanishButton.Text = _l["SettingsLanguageSpanish"];
+        EnglishButton.Text = _l["SettingsLanguageEnglish"];
 
         SpanishButton.Style = LookupStyle(isSpanish ? "PrimaryButton" : "OutlineButton");
         EnglishButton.Style = LookupStyle(isSpanish ? "OutlineButton" : "PrimaryButton");

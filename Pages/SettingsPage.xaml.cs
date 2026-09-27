@@ -39,20 +39,20 @@ public partial class SettingsPage : ContentPage
     {
         Title = _l["SettingsTitle"];
 
-        LanguageTitle.Text = $"🌐 {_l["SettingsLanguage"]}";
+        LanguageTitle.Text = _l["SettingsLanguage"];
         LanguageHint.Text = _l["SettingsLanguageHint"];
 
-        DisplayTitle.Text = $"👁️ {_l["SettingsDisplay"]}";
+        DisplayTitle.Text = _l["SettingsDisplay"];
         ShowHiddenLabel.Text = _l["SettingsShowHidden"];
         ShowHiddenHint.Text = _l["SettingsShowHiddenHint"];
         ConfirmDeleteLabel.Text = _l["SettingsConfirmDelete"];
         ConfirmDeleteHint.Text = _l["SettingsConfirmDeleteHint"];
 
-        StorageTitle.Text = $"💾 {_l["SettingsStorage"]}";
+        StorageTitle.Text = _l["SettingsStorage"];
         PermissionStateLabel.Text = _l["SettingsPermissionState"];
         PermissionButton.Text = _l["PermissionOpenSettings"];
 
-        AboutButton.Text = $"ℹ️ {_l["About"]}";
+        AboutButton.Text = _l["About"];
 
         UpdateLanguageButtons();
     }
@@ -63,10 +63,10 @@ public partial class SettingsPage : ContentPage
     {
         var isSpanish = _l.CurrentLanguage == "es";
 
-        // El nombre del idioma se resuelve por localizacion (constitucion 8); la bandera es un
-        // glifo decorativo (indicador regional) que se antepone.
-        SpanishButton.Text = $"🇪🇸 {_l["SettingsLanguageSpanish"]}";
-        EnglishButton.Text = $"🇺🇸 {_l["SettingsLanguageEnglish"]}";
+        // El nombre del idioma se resuelve por localizacion (constitucion 8); la bandera es el icono
+        // dibujado del boton (ic_flag_*.svg en el XAML), nunca emoji (General 6.2).
+        SpanishButton.Text = _l["SettingsLanguageSpanish"];
+        EnglishButton.Text = _l["SettingsLanguageEnglish"];
 
         SpanishButton.Style = LookupStyle(isSpanish ? "PrimaryButton" : "OutlineButton");
         EnglishButton.Style = LookupStyle(isSpanish ? "OutlineButton" : "PrimaryButton");

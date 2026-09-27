@@ -9,11 +9,16 @@
             <!-- Idioma -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="20,16" Spacing="12">
-                    <Label x:Name="LanguageTitle" Style="{StaticResource CardTitle}" />
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="ic_language.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Grid.Column="1" VerticalOptions="Center" x:Name="LanguageTitle" Style="{StaticResource CardTitle}" />
+                    </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <Button Grid.Column="0"
                                 x:Name="SpanishButton"
+                                ImageSource="ic_flag_es.png"
+                                ContentLayout="Left,8"
                                 FontSize="14"
                                 LineBreakMode="WordWrap"
                                 Padding="10,10"
@@ -21,6 +26,8 @@
 
                         <Button Grid.Column="1"
                                 x:Name="EnglishButton"
+                                ImageSource="ic_flag_us.png"
+                                ContentLayout="Left,8"
                                 FontSize="14"
                                 LineBreakMode="WordWrap"
                                 Padding="10,10"
@@ -34,7 +41,10 @@
             <!-- Visualizacion -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="20,16" Spacing="14">
-                    <Label x:Name="DisplayTitle" Style="{StaticResource CardTitle}" />
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="ic_visibility.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Grid.Column="1" VerticalOptions="Center" x:Name="DisplayTitle" Style="{StaticResource CardTitle}" />
+                    </Grid>
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                         <VerticalStackLayout Grid.Column="0" Spacing="2">
@@ -70,7 +80,10 @@
             <!-- Almacenamiento -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="20,16" Spacing="12">
-                    <Label x:Name="StorageTitle" Style="{StaticResource CardTitle}" />
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="ic_storage.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Grid.Column="1" VerticalOptions="Center" x:Name="StorageTitle" Style="{StaticResource CardTitle}" />
+                    </Grid>
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                         <Label x:Name="PermissionStateLabel"
@@ -91,6 +104,8 @@
             </Border>
 
             <Button x:Name="AboutButton"
+                    ImageSource="ic_info_w.png"
+                    ContentLayout="Left,8"
                     Style="{StaticResource PrimaryButton}"
                     Clicked="OnAboutClicked" />
 

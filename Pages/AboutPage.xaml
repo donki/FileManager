@@ -39,7 +39,10 @@
             <!-- Contacto -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="25,20" Spacing="12">
-                    <Label x:Name="ContactTitle" Style="{StaticResource CardTitle}" />
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="ic_mail.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Grid.Column="1" VerticalOptions="Center" x:Name="ContactTitle" Style="{StaticResource CardTitle}" />
+                    </Grid>
 
                     <Button x:Name="ContactButton"
                             Style="{StaticResource OutlineButton}"
@@ -55,11 +58,16 @@
             <!-- Idioma -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="25,20" Spacing="12">
-                    <Label x:Name="LanguageTitle" Style="{StaticResource CardTitle}" />
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="ic_language.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Grid.Column="1" VerticalOptions="Center" x:Name="LanguageTitle" Style="{StaticResource CardTitle}" />
+                    </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <Button Grid.Column="0"
                                 x:Name="SpanishButton"
+                                ImageSource="ic_flag_es.png"
+                                ContentLayout="Left,8"
                                 FontSize="14"
                                 LineBreakMode="WordWrap"
                                 Padding="10,10"
@@ -67,6 +75,8 @@
 
                         <Button Grid.Column="1"
                                 x:Name="EnglishButton"
+                                ImageSource="ic_flag_us.png"
+                                ContentLayout="Left,8"
                                 FontSize="14"
                                 LineBreakMode="WordWrap"
                                 Padding="10,10"
@@ -82,9 +92,13 @@
             <!-- Privacidad -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="25,20" Spacing="10">
-                    <Label x:Name="PrivacyTitle"
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="ic_lock.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Grid.Column="1" VerticalOptions="Center"
+                           x:Name="PrivacyTitle"
                            Style="{StaticResource CardTitle}"
                            TextColor="{StaticResource Success}" />
+                    </Grid>
                     <Label x:Name="PrivacyText"
                            Style="{StaticResource BodyText}"
                            FontSize="13"
@@ -95,7 +109,10 @@
             <!-- Licencia -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="25,20" Spacing="10">
-                    <Label x:Name="LicenseTitle" Style="{StaticResource CardTitle}" />
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="ic_license.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Grid.Column="1" VerticalOptions="Center" x:Name="LicenseTitle" Style="{StaticResource CardTitle}" />
+                    </Grid>
                     <Label x:Name="LicenseText"
                            Style="{StaticResource BodyText}"
                            FontSize="13"
@@ -109,9 +126,13 @@
             <!-- Aviso legal -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="25,20" Spacing="12">
-                    <Label x:Name="LegalTitle"
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="ic_legal_danger.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Grid.Column="1" VerticalOptions="Center"
+                           x:Name="LegalTitle"
                            Style="{StaticResource CardTitle}"
                            TextColor="{StaticResource Danger}" />
+                    </Grid>
 
                     <Border BackgroundColor="{AppThemeBinding Light={StaticResource WarningSurfaceLight}, Dark={StaticResource WarningSurfaceDark}}"
                             StrokeThickness="0"
@@ -135,12 +156,16 @@
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="6" />
                                 </Border.StrokeShape>
-                                <Label x:Name="WarningText"
-                                       FontSize="13"
-                                       FontAttributes="Bold"
-                                       LineHeight="1.4"
-                                       TextColor="{StaticResource White}"
-                                       HorizontalOptions="Center" />
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" HorizontalOptions="Center">
+                                    <Image Source="ic_warning_w.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                                    <Label x:Name="WarningText"
+                                           Grid.Column="1"
+                                           FontSize="13"
+                                           FontAttributes="Bold"
+                                           LineHeight="1.4"
+                                           TextColor="{StaticResource White}"
+                                           VerticalOptions="Center" />
+                                </Grid>
                             </Border>
                         </VerticalStackLayout>
                     </Border>
@@ -148,6 +173,8 @@
             </Border>
 
             <Button x:Name="BackButton"
+                    ImageSource="ic_arrow_back.png"
+                    ContentLayout="Left,8"
                     Style="{StaticResource PrimaryButton}"
                     Clicked="OnBackClicked"
                     HorizontalOptions="Fill"

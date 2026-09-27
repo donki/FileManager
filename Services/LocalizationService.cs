@@ -156,7 +156,7 @@ public class LocalizationService : ILocalizationService
         ["Ok"] = "OK",
         ["Close"] = "Close",
         ["Save"] = "Save",
-        ["Back"] = "← Back",
+        ["Back"] = "Back",
 
         // Dialogos
         ["NewFolderTitle"] = "New folder",
@@ -247,7 +247,7 @@ public class LocalizationService : ILocalizationService
         ["AboutLegal"] = "Legal Notice",
         ["AboutLegal1"] = "This software is provided 'as is', without warranty of any kind. The user is responsible for proper use of the app and compliance with local laws.",
         ["AboutLegal2"] = "In no event shall the authors be liable for any direct, indirect, incidental or consequential damages arising from the use of this software.",
-        ["AboutWarning"] = "⚠️ Use at your own risk",
+        ["AboutWarning"] = "Use at your own risk",
         ["AboutPrivacy"] = "Privacy",
         ["AboutPrivacyText"] = "This app does not collect your personal data or send it to the developers. Information is processed on your device for the app's own purpose.",
         ["AboutLicense"] = "License",
@@ -339,7 +339,7 @@ public class LocalizationService : ILocalizationService
         ["Ok"] = "Aceptar",
         ["Close"] = "Cerrar",
         ["Save"] = "Guardar",
-        ["Back"] = "← Volver",
+        ["Back"] = "Volver",
 
         // Dialogos
         ["NewFolderTitle"] = "Nueva carpeta",
@@ -430,7 +430,7 @@ public class LocalizationService : ILocalizationService
         ["AboutLegal"] = "Aviso Legal",
         ["AboutLegal1"] = "Este software se proporciona «tal cual», sin garantías de ningún tipo. El usuario es responsable del uso adecuado de la aplicación y del cumplimiento de las leyes locales.",
         ["AboutLegal2"] = "En ningún caso los autores serán responsables de daños directos, indirectos, incidentales o consecuentes que resulten del uso de este software.",
-        ["AboutWarning"] = "⚠️ Uso bajo su propio riesgo",
+        ["AboutWarning"] = "Uso bajo su propio riesgo",
         ["AboutPrivacy"] = "Privacidad",
         ["AboutPrivacyText"] = "Esta aplicación no recopila tus datos personales ni los envía a los desarrolladores. La información se procesa en tu dispositivo para la función propia de la app.",
         ["AboutLicense"] = "Licencia",

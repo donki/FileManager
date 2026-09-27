@@ -9,6 +9,11 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        // Gestor global de excepciones (General 6.12): un error inesperado se registra y se avisa en
+        // el idioma elegido en la app (no toca la cultura), y la app sigue.
+        SocShared.CrashGuard.Install("File Manager", language: () =>
+            IPlatformApplication.Current?.Services.GetService<ILocalizationService>()?.CurrentLanguage);
+
         var builder = MauiApp.CreateBuilder();
 
         // Sin fuentes propias: se usa la del sistema, que ya cubre los idiomas soportados.

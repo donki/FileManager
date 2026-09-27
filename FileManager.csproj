@@ -16,8 +16,8 @@
     <ApplicationId>com.socratic.filemanager</ApplicationId>
 
     <!-- Versions (constitucion 6: ambos valores en sincronia) -->
-    <ApplicationDisplayVersion>2026.09.26.0</ApplicationDisplayVersion>
-    <ApplicationVersion>2026092600</ApplicationVersion>
+    <ApplicationDisplayVersion>2026.09.28.0</ApplicationDisplayVersion>
+    <ApplicationVersion>2026092800</ApplicationVersion>
 
     <!-- Accept Android SDK Licenses -->
     <AcceptAndroidSDKLicenses>true</AcceptAndroidSDKLicenses>
@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="..\Shared\AuthorNotes.cs" Link="AuthorNotes.cs" />
     <Compile Include="..\Shared\ModernDialog.cs" Link="ModernDialog.cs" />
+    <Compile Include="..\Shared\CrashGuard.cs" Link="CrashGuard.cs" />
   </ItemGroup>
 
   <!-- Firma Release centralizada (constitucion 7). Define AndroidKeyStore=true, por lo que

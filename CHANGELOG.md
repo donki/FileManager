@@ -4,6 +4,27 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.09.28.0] — 2026-09-28
+
+### Añadido
+- **Gestor global de excepciones** (General §6.12) con la pieza común `Mobile/Shared/CrashGuard.cs`:
+  un error inesperado ya no cierra la aplicación; se registra con su traza en `crash.log` y se
+  avisa en el idioma elegido en la app (es/en).
+
+### Cambiado
+- Fuera los emoji de la interfaz (General §6.2): los títulos de Configuración (Idioma,
+  Visualización, Almacenamiento) y de Acerca de (Contacto, Idioma, Privacidad, Licencia, Aviso
+  legal) llevan iconos planos SVG; los botones de idioma, la bandera dibujada (`ic_flag_es`,
+  `ic_flag_us`) en vez del emoji; «Acerca de», «Volver», el aviso de riesgo y el cierre de la
+  selección, su icono; y los estados vacíos (carpeta vacía, búsqueda sin resultados, sin permiso)
+  un dibujo plano en vez del emoji.
+
+### English
+- Global exception handler: an unexpected error no longer closes the app; it is logged and you
+  are told in the app's language.
+- No more emoji in the interface: flat SVG icons in Settings and About, drawn flags on the
+  language buttons, and flat drawings in the empty states.
+
 ## [2026.09.26.0] — 2026-09-26
 
 ### Corregido

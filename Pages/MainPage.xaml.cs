@@ -255,7 +255,7 @@ public partial class MainPage : ContentPage
 
         ApplyFilterAndShow();
 
-        EmptyIconLabel.Text = isSearch ? "🔍" : "📂";
+        EmptyIconImage.Source = isSearch ? "ic_search_empty.png" : "ic_folder_open.png";
         EmptyTitleLabel.Text = isSearch ? _l["NoSearchResults"] : _l["EmptyFolder"];
         EmptyHintLabel.IsVisible = !isSearch;
 

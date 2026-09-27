@@ -108,8 +108,7 @@
             <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="4" VerticalOptions="Center">
                 <Button x:Name="SelCloseButton"
                         Grid.Column="0"
-                        Text="✕"
-                        FontSize="18"
+                        ImageSource="ic_close_w.png"
                         WidthRequest="40"
                         HeightRequest="40"
                         Padding="0"
@@ -241,7 +240,7 @@
                                  HorizontalOptions="Center"
                                  Padding="40"
                                  Spacing="10">
-                <Label x:Name="EmptyIconLabel" Text="📂" FontSize="56" HorizontalOptions="Center" Opacity="0.5" />
+                <Image x:Name="EmptyIconImage" Source="ic_folder_open.png" WidthRequest="64" HeightRequest="64" HorizontalOptions="Center" Opacity="0.5" />
                 <Label x:Name="EmptyTitleLabel"
                        FontSize="16"
                        HorizontalTextAlignment="Center"
@@ -254,7 +253,7 @@
             <!-- Puerta de permisos: sin acceso no hay nada que listar -->
             <ScrollView x:Name="PermissionView" IsVisible="False">
                 <VerticalStackLayout Padding="24" Spacing="16" VerticalOptions="Center">
-                    <Label Text="🔒" FontSize="56" HorizontalOptions="Center" />
+                    <Image Source="ic_lock.png" WidthRequest="64" HeightRequest="64" HorizontalOptions="Center" />
                     <Label x:Name="PermissionTitleLabel"
                            FontSize="20"
                            FontAttributes="Bold"
