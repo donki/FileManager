@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Pruebas de la logica de File Manager (constitucion General 8.6). La app es un proyecto MAUI
+       Android de un solo proyecto: aqui se enlazan sus ficheros puros (servicios, modelos, ayudantes)
+       y se compilan para net10.0, sin interfaz ni dispositivo. Lo poco de MAUI que tocan
+       (Preferences) lo sustituye un doble en memoria de Stubs/. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>FileManager.Tests</RootNamespace>
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)coverlet.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- xunit y su runner (Apache-2.0), Microsoft.NET.Test.Sdk y coverlet (MIT): solo para probar, no se distribuyen. -->
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Microsoft.Maui.Storage" />
+  </ItemGroup>
+
+  <!-- Codigo de la app que se prueba (enlazado, no copiado). -->
+  <ItemGroup>
+    <Compile Include="..\Models\*.cs" Link="App\Models\%(Filename)%(Extension)" />
+    <Compile Include="..\Helpers\FileIcons.cs" Link="App\Helpers\FileIcons.cs" />
+    <Compile Include="..\Helpers\MimeTypes.cs" Link="App\Helpers\MimeTypes.cs" />
+    <Compile Include="..\Helpers\SizeFormatter.cs" Link="App\Helpers\SizeFormatter.cs" />
+    <Compile Include="..\Services\IFileSystemService.cs" Link="App\Services\IFileSystemService.cs" />
+    <Compile Include="..\Services\FileSystemService.cs" Link="App\Services\FileSystemService.cs" />
+    <Compile Include="..\Services\IFileClipboardService.cs" Link="App\Services\IFileClipboardService.cs" />
+    <Compile Include="..\Services\FileClipboardService.cs" Link="App\Services\FileClipboardService.cs" />
+    <Compile Include="..\Services\ISettingsService.cs" Link="App\Services\ISettingsService.cs" />
+    <Compile Include="..\Services\SettingsService.cs" Link="App\Services\SettingsService.cs" />
+    <Compile Include="..\Services\ILocalizationService.cs" Link="App\Services\ILocalizationService.cs" />
+    <Compile Include="..\Services\LocalizationService.cs" Link="App\Services\LocalizationService.cs" />
+  </ItemGroup>
+
+</Project>

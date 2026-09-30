@@ -16,8 +16,8 @@
     <ApplicationId>com.socratic.filemanager</ApplicationId>
 
     <!-- Versions (constitucion 6: ambos valores en sincronia) -->
-    <ApplicationDisplayVersion>2026.09.28.0</ApplicationDisplayVersion>
-    <ApplicationVersion>2026092800</ApplicationVersion>
+    <ApplicationDisplayVersion>2026.09.30.0</ApplicationDisplayVersion>
+    <ApplicationVersion>2026093000</ApplicationVersion>
 
     <!-- Accept Android SDK Licenses -->
     <AcceptAndroidSDKLicenses>true</AcceptAndroidSDKLicenses>
@@ -43,6 +43,9 @@
     <AndroidUseAapt2>true</AndroidUseAapt2>
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
     <UseInterpreter>false</UseInterpreter>
+
+    <!-- El proyecto de pruebas vive dentro de la carpeta de la app: fuera de sus comodines. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);FileManager.Tests\**</DefaultItemExcludes>
 
     <AssemblyVersion>2026.07.15.0</AssemblyVersion>
     <FileVersion>2026.07.15.0</FileVersion>

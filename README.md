@@ -46,6 +46,25 @@ git clone --recurse-submodules https://github.com/donki/FileManager.git
 - Diseño con tarjetas, tema **claro y oscuro** automático
 - Adaptada al modo *edge-to-edge* de Android 15+
 
+## 🧪 Pruebas
+
+142 pruebas automatizadas (xUnit) de la lógica de la app, sin interfaz ni dispositivo: operaciones de
+ficheros sobre carpetas temporales (listar, ordenar, buscar, crear, renombrar, borrar, copiar/mover
+con conflictos), validación de nombres, portapapeles, tamaños, tipos MIME, iconos, categorías,
+preferencias y traducciones (mismas claves y marcadores en castellano e inglés).
+
+| Fecha | Pruebas | Cobertura de lo instrumentado | Cobertura sobre toda la app | Tiempo del banco |
+|---|---|---|---|---|
+| 2026-09-30 | 142 (todas pasan) | 98,9 % (874 / 883 líneas) | 36,2 % (874 / 2412 líneas) | ~1 s de pruebas, ~6 s con el arranque de `dotnet test` |
+
+```bash
+dotnet test FileManager.Tests                      # solo las pruebas
+pwsh FileManager.Tests/cobertura.ps1               # pruebas + las dos coberturas + tiempo
+```
+
+Lo que queda sin probar son las páginas (interfaz MAUI) y lo que depende de Android (permisos de
+almacenamiento, abrir/compartir con otras apps, avisos, comprobación de versión por red).
+
 ## 🚀 Instalación
 
 ### Requisitos

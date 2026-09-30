@@ -240,12 +240,16 @@ public class FileSystemService : IFileSystemService
                         if (entry.IsMove)
                             continue;
 
-                        target = GetUniquePath(target);
+                        target = GetUniquePath(target, isDirectory);
                     }
                     else if (File.Exists(target) || Directory.Exists(target))
                     {
                         if (resolution == ConflictResolution.KeepBoth)
-                            target = GetUniquePath(target);
+                            target = GetUniquePath(target, isDirectory);
+                        else if (IsInside(target, source))
+                            // Reemplazar la carpeta que contiene lo que se pega (pegar p/x/x en p)
+                            // borraria tambien el origen antes de moverlo o copiarlo.
+                            throw new InvalidOperationException("An item cannot replace the folder that contains it.");
                         else
                             DeleteTarget(target);
                     }
@@ -343,12 +347,15 @@ public class FileSystemService : IFileSystemService
         }
     }
 
-    /// <summary>Devuelve una ruta libre anadiendo " (2)", " (3)"… al nombre.</summary>
-    private static string GetUniquePath(string target)
+    /// <summary>
+    /// Devuelve una ruta libre anadiendo " (2)", " (3)"… al nombre. En las carpetas el punto no
+    /// separa ninguna extension: "release.v2" pasa a "release.v2 (2)", no a "release (2).v2".
+    /// </summary>
+    private static string GetUniquePath(string target, bool isDirectory)
     {
         var directory = Path.GetDirectoryName(target) ?? string.Empty;
-        var name = Path.GetFileNameWithoutExtension(target);
-        var extension = Path.GetExtension(target);
+        var name = isDirectory ? Path.GetFileName(target) : Path.GetFileNameWithoutExtension(target);
+        var extension = isDirectory ? string.Empty : Path.GetExtension(target);
 
         for (var index = 2; index < int.MaxValue; index++)
         {

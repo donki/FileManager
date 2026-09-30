@@ -4,6 +4,26 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.09.30.0] — 2026-09-30
+
+### Corregido
+- **Pegar con «Reemplazar» ya no puede borrar lo que se pega.** Al pegar una carpeta en la carpeta
+  que la contiene dos niveles arriba (por ejemplo `p/x/x` en `p`, donde ya existe `p/x`), reemplazar
+  borraba `p/x` —y con ella el origen— antes de moverla. Ahora se rechaza ese elemento con un error y
+  no se pierde nada.
+- Al copiar una carpeta con un punto en el nombre dentro de su misma carpeta, la copia se llama
+  `release.v2 (2)` y no `release (2).v2`.
+
+### Añadido
+- **Pruebas automatizadas** (General §8.6): proyecto `FileManager.Tests` (xUnit) con la lógica de
+  ficheros, ordenación, búsqueda, validación de nombres, portapapeles, tamaños, tipos MIME, iconos,
+  preferencias y traducciones. Se ejecutan con `dotnet test FileManager.Tests`.
+
+### English
+- Paste with «Replace» can no longer delete what is being pasted when the target folder contains it.
+- Copying a folder whose name has a dot into its own folder now names it `release.v2 (2)`.
+- Automated tests for the app logic (`dotnet test FileManager.Tests`).
+
 ## [2026.09.28.0] — 2026-09-28
 
 ### Añadido
