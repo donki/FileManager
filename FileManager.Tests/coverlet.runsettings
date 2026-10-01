@@ -9,7 +9,7 @@
           <Format>cobertura</Format>
           <IncludeTestAssembly>true</IncludeTestAssembly>
           <ExcludeByFile>**/*.Tests/**/*.cs,**/Microsoft.NET.Test.Sdk.Program.cs</ExcludeByFile>
-          <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+          <ExcludeByAttribute>GeneratedCodeAttribute</ExcludeByAttribute>
         </Configuration>
       </DataCollector>
     </DataCollectors>

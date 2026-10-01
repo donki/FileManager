@@ -4,6 +4,29 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.10.01.0] — 2026-10-01
+
+### Cambiado
+- **La lógica de las pantallas sale a clases que se pueden probar** (General §8.6): `ViewModels/`
+  (`MainViewModel`, `SettingsViewModel`, `AboutViewModel`) tiene todo lo que hacían las páginas
+  (carpeta actual, listado, filtro, búsqueda, selección múltiple, portapapeles, menús, idioma, permiso
+  y contacto) y las páginas quedan como enlace fino que vuelca su estado en los controles. Los
+  diálogos (`IDialogService`) y lo del sistema (`IAppEnvironment`: versión, navegador y correo) van
+  detrás de interfaces. La comprobación de versión recibe el cliente HTTP y se prueba sin red. El
+  usuario no ve ningún cambio.
+- **Pruebas: 260** (antes 142). Cobertura sobre toda la app: **65,6 %** (antes 36,6 % con la medida
+  corregida; ver abajo); de lo instrumentado, 99,4 %.
+- **Medida de la cobertura corregida**: el `coverlet.runsettings` excluía `CompilerGeneratedAttribute`,
+  que deja fuera el cuerpo de todos los métodos `async` y de las lambdas (sus máquinas de estado son
+  código generado). Ahora solo se excluye `GeneratedCodeAttribute`. Con la medida vieja la versión
+  anterior daba 36,2 %; con la nueva, 36,6 %.
+
+### English
+- Screen logic moved out of the pages into testable view-models (`ViewModels/`); dialogs and system
+  services behind interfaces. No visible change.
+- 260 automated tests (was 142); whole-app line coverage 65.6 % (was 36.6 %).
+- Coverage settings no longer exclude compiler-generated code, which hid every `async` method body.
+
 ## [2026.09.30.0] — 2026-09-30
 
 ### Corregido

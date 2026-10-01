@@ -1,24 +1,23 @@
+using FileManager.Helpers;
 using FileManager.Services;
+using FileManager.ViewModels;
 using Microsoft.Extensions.Logging;
 
 namespace FileManager.Pages;
 
+/// <summary>Acerca de: enlace fino con <see cref="AboutViewModel"/>.</summary>
 public partial class AboutPage : ContentPage
 {
-    // CONFIGURACION
-    private const string ContactEmail = "jsoladelarosa@gmail.com";
-
     private readonly ILocalizationService _l;
-    private readonly ISettingsService _settings;
-    private readonly ILogger<AboutPage> _logger;
+    private readonly AboutViewModel _vm;
+    private readonly IDialogService _dialogs;
 
-    public AboutPage(ILocalizationService localization, ISettingsService settings, ILogger<AboutPage> logger)
+    public AboutPage(ILocalizationService localization, ISettingsService settings, IAppEnvironment environment, ILogger<AboutPage> logger)
     {
         InitializeComponent();
-
         _l = localization;
-        _settings = settings;
-        _logger = logger;
+        _vm = new AboutViewModel(localization, settings, environment, logger);
+        _dialogs = new PageDialogService(this);
     }
 
     protected override void OnAppearing()
@@ -29,49 +28,14 @@ public partial class AboutPage : ContentPage
 
     private void ApplyTexts()
     {
-        Title = _l["AboutTitle"];
+        Title = _l[AboutViewModel.TitleKey];
+        PageTexts.Apply(this, AboutViewModel.StaticTexts, _l);
+        VersionLabel.Text = _vm.VersionText;
+        ContactButton.Text = AboutViewModel.ContactEmail;
 
-        AppNameLabel.Text = _l["AppName"];
-        VersionLabel.Text = string.Format(_l.CurrentCulture, _l["AboutVersion"], AppInfo.Current.VersionString);
-        DescriptionLabel.Text = _l["AppDescription"];
-        CompanyLabel.Text = _l["Company"];
-
-        ContactTitle.Text = _l["AboutContact"];
-        ContactButton.Text = ContactEmail;
-        ContactHint.Text = _l["AboutContactHint"];
-
-        PrivacyTitle.Text = _l["AboutPrivacy"];
-        PrivacyText.Text = _l["AboutPrivacyText"];
-
-        LicenseTitle.Text = _l["AboutLicense"];
-        LicenseText.Text = _l["AboutLicenseText"];
-
-
-        LanguageTitle.Text = _l["SettingsLanguage"];
-        LanguageHint.Text = _l["AboutLanguageHint"];
-        UpdateLanguageButtons();
-
-        LegalTitle.Text = _l["AboutLegal"];
-        LegalText1.Text = _l["AboutLegal1"];
-        LegalText2.Text = _l["AboutLegal2"];
-        WarningText.Text = _l["AboutWarning"];
-
-        BackButton.Text = _l["Back"];
-    }
-
-    // Botones de idioma con bandera (constitucion, anexo A.9): el activo (es/en) usa el estilo
-    // primario y el otro el de contorno. La eleccion se persiste igual que en Configuracion.
-    private void UpdateLanguageButtons()
-    {
-        var isSpanish = _l.CurrentLanguage == "es";
-
-        // El nombre del idioma se resuelve por localizacion (constitucion 8); la bandera es el icono
-        // dibujado del boton (ic_flag_*.svg en el XAML), nunca emoji (General 6.2).
-        SpanishButton.Text = _l["SettingsLanguageSpanish"];
-        EnglishButton.Text = _l["SettingsLanguageEnglish"];
-
-        SpanishButton.Style = LookupStyle(isSpanish ? "PrimaryButton" : "OutlineButton");
-        EnglishButton.Style = LookupStyle(isSpanish ? "OutlineButton" : "PrimaryButton");
+        // Botones de idioma con bandera (constitucion, anexo A.9): el activo usa el estilo primario.
+        SpanishButton.Style = LookupStyle(_vm.IsSpanish ? "PrimaryButton" : "OutlineButton");
+        EnglishButton.Style = LookupStyle(_vm.IsSpanish ? "OutlineButton" : "PrimaryButton");
     }
 
     private static Style? LookupStyle(string key)
@@ -83,45 +47,19 @@ public partial class AboutPage : ContentPage
 
     private void SetLanguage(string code)
     {
-        if (code == _l.CurrentLanguage)
-            return;
-
-        _settings.Language = code;
-        _l.SetLanguage(code);
-        ApplyTexts();
+        if (_vm.SetLanguage(code))
+            ApplyTexts();
     }
 
     private async void OnBackClicked(object? sender, EventArgs e)
     {
-        // Con Shell la pagina puede haberse abierto desde el flyout (sin pila que desapilar) o
-        // apilada desde el menu «⋮»/Configuracion. Si hay pila, se desapila; si no, se vuelve a Inicio.
+        // Con Shell la pagina puede haberse abierto desde el flyout (sin pila que desapilar) o apilada
+        // desde el menu «⋮»/Configuracion. Si hay pila, se desapila; si no, se vuelve a Inicio.
         if (Navigation.NavigationStack.Count > 1)
             await Navigation.PopAsync();
         else if (Shell.Current is not null)
             await Shell.Current.GoToAsync("//MainPage");
     }
 
-    private async void OnContactEmailClicked(object? sender, EventArgs e)
-    {
-        try
-        {
-            var message = new EmailMessage
-            {
-                Subject = _l["EmailSubject"],
-                To = new List<string> { ContactEmail }
-            };
-
-            await Email.Default.ComposeAsync(message);
-        }
-        catch (FeatureNotSupportedException)
-        {
-            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], _l["ErrorEmailNotAvailable"], _l["Ok"]);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Could not open the email client");
-            await SocShared.ModernDialog.AlertAsync(this, _l["Error"], $"{_l["ErrorEmail"]}: {ex.Message}", _l["Ok"]);
-        }
-    }
-
+    private async void OnContactEmailClicked(object? sender, EventArgs e) => await _vm.ContactAsync(_dialogs);
 }

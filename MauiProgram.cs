@@ -35,13 +35,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<IFileActionsService, FileActionsService>();
         // El registro se perdio en el incidente de reorganizacion y la app abortaba al arrancar:
         // App.CreateWindow resuelve MainPage, que pide UpdateService por constructor.
+        builder.Services.AddSingleton<IAppEnvironment, MauiAppEnvironment>();
         builder.Services.AddSingleton<UpdateService>();
 #if ANDROID
         builder.Services.AddSingleton<IStoragePermissionService, Platforms.Android.StoragePermissionService>();
         builder.Services.AddSingleton<IToastService, Platforms.Android.ToastService>();
 #endif
 
-        // Paginas (carpeta Pages, sin ViewModels: ver README, seccion Arquitectura).
+        // Paginas (carpeta Pages): enlace fino con su logica en ViewModels (ver README, Arquitectura).
         builder.Services.AddSingleton<MainPage>();
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<AboutPage>();

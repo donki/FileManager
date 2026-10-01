@@ -48,6 +48,13 @@
     <Compile Include="..\Services\SettingsService.cs" Link="App\Services\SettingsService.cs" />
     <Compile Include="..\Services\ILocalizationService.cs" Link="App\Services\ILocalizationService.cs" />
     <Compile Include="..\Services\LocalizationService.cs" Link="App\Services\LocalizationService.cs" />
+    <Compile Include="..\Services\IFileActionsService.cs" Link="App\Services\IFileActionsService.cs" />
+    <Compile Include="..\Services\IStoragePermissionService.cs" Link="App\Services\IStoragePermissionService.cs" />
+    <Compile Include="..\Services\IToastService.cs" Link="App\Services\IToastService.cs" />
+    <Compile Include="..\Services\IDialogService.cs" Link="App\Services\IDialogService.cs" />
+    <Compile Include="..\Services\IAppEnvironment.cs" Link="App\Services\IAppEnvironment.cs" />
+    <Compile Include="..\Services\UpdateService.cs" Link="App\Services\UpdateService.cs" />
+    <Compile Include="..\ViewModels\*.cs" Link="App\ViewModels\%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

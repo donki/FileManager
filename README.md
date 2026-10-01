@@ -48,22 +48,31 @@ git clone --recurse-submodules https://github.com/donki/FileManager.git
 
 ## 🧪 Pruebas
 
-142 pruebas automatizadas (xUnit) de la lógica de la app, sin interfaz ni dispositivo: operaciones de
-ficheros sobre carpetas temporales (listar, ordenar, buscar, crear, renombrar, borrar, copiar/mover
-con conflictos), validación de nombres, portapapeles, tamaños, tipos MIME, iconos, categorías,
-preferencias y traducciones (mismas claves y marcadores en castellano e inglés).
+260 pruebas automatizadas (xUnit) de la lógica de la app, sin interfaz ni dispositivo: la lógica de
+las tres pantallas (`ViewModels/`: navegación, ruta de migas, filtro, búsqueda con cancelación,
+selección múltiple, menús, renombrar, borrar, pegar con conflictos, permiso, idioma, contacto),
+operaciones de ficheros sobre carpetas temporales, validación de nombres, portapapeles, comprobación
+de versión (con un HTTP simulado), tamaños, tipos MIME, iconos, categorías, preferencias y
+traducciones (mismas claves y marcadores en castellano e inglés).
 
 | Fecha | Pruebas | Cobertura de lo instrumentado | Cobertura sobre toda la app | Tiempo del banco |
 |---|---|---|---|---|
-| 2026-09-30 | 142 (todas pasan) | 98,9 % (874 / 883 líneas) | 36,2 % (874 / 2412 líneas) | ~1 s de pruebas, ~6 s con el arranque de `dotnet test` |
+| 2026-10-01 | 260 (todas pasan) | 99,4 % (1706 / 1716 líneas) | 65,6 % (1706 / 2600 líneas) | ~1 s de pruebas, ~4 s con el arranque de `dotnet test` |
+| 2026-09-30 | 142 (todas pasan) | 98,9 % (874 / 883 líneas) | 36,2 % (874 / 2412 líneas)* | ~1 s de pruebas, ~6 s con el arranque de `dotnet test` |
+
+\* Con la medida antigua, que dejaba fuera los métodos `async` y las lambdas; con la corregida, 36,6 %.
 
 ```bash
 dotnet test FileManager.Tests                      # solo las pruebas
 pwsh FileManager.Tests/cobertura.ps1               # pruebas + las dos coberturas + tiempo
 ```
 
-Lo que queda sin probar son las páginas (interfaz MAUI) y lo que depende de Android (permisos de
-almacenamiento, abrir/compartir con otras apps, avisos, comprobación de versión por red).
+Lo que queda sin probar es la capa que solo existe en el dispositivo: las páginas (el volcado del
+estado en los controles y los manejadores de una línea), `Platforms/Android` (permisos, insets,
+toasts), el arranque (`MauiProgram`, `App`, `AppShell`), los gestos nativos (`ItemTouchBehavior`) y
+los adaptadores de MAUI (`FileActionsService`, `MauiAppEnvironment`, `PageDialogService`). Las
+interfaces, los `using`, las llaves y las declaraciones también cuentan como líneas sin cubrir en la
+cifra de toda la app. El plan para llegar al 90 % (General §8.6) está en el fichero de tareas.
 
 ## 🚀 Instalación
 
@@ -117,7 +126,8 @@ y no recoge estadísticas de uso.
 ### Estructura del proyecto
 ```
 FileManager/
-├── Pages/                 # Páginas de la aplicación (XAML + code-behind)
+├── Pages/                 # Páginas (XAML + code-behind fino que vuelca el estado)
+├── ViewModels/            # Lógica de cada pantalla, sin MAUI (se prueba en FileManager.Tests)
 ├── Services/              # Lógica de negocio e interfaces
 ├── Models/                # Entidades de datos
 ├── Helpers/               # Utilidades transversales (iconos, MIME, tamaños, DI)
@@ -128,20 +138,25 @@ FileManager/
 
 ### Arquitectura de presentación
 
-Capa de presentación ligera, el enfoque por defecto de la constitución §7: **code-behind delgado que
-delega en `Services/`**, sin ViewModels ni librerías de binding.
+Desde la 2026.10.01.0 la lógica de cada pantalla vive en `ViewModels/`, en clases de C# sin MAUI
+que se prueban en `FileManager.Tests` (General §8.6). Sin librerías de binding: cada página crea su
+view-model, le pasa los toques y, cuando cambia (`Changed`), vuelca su estado en los controles.
 
-- **Toda** la lógica de negocio vive en `Services/` detrás de interfaces (`IFileSystemService`,
+- La lógica de negocio vive en `Services/` detrás de interfaces (`IFileSystemService`,
   `IFileClipboardService`, `ILocalizationService`, `ISettingsService`, `IStoragePermissionService`,
   `IFileActionsService`, `IToastService`).
-- El code-behind solo orquesta: pide datos al servicio, los vuelca en los controles y muestra errores.
+- Lo que solo existe en el dispositivo va detrás de interfaces con su implementación real y un doble
+  en las pruebas: los diálogos (`IDialogService` → `PageDialogService`, sobre `ModernDialog`) y el
+  sistema (`IAppEnvironment` → `MauiAppEnvironment`: versión, navegador y correo).
+- Los textos fijos de cada página son datos del view-model (`StaticTexts`: control → clave), que
+  `Helpers/PageTexts` vuelca; una prueba comprueba que todas las claves existen en los dos idiomas.
 - Todos los servicios se registran e inyectan por dependencias en `MauiProgram.cs`.
 - El código específico de Android está encapsulado en `Platforms/Android`.
 
 ### Localización
 
 Los textos están centralizados en `Services/LocalizationService.cs` (constitución §8). Cada página
-vuelca los textos en un método `ApplyTexts()` que se llama en `OnAppearing` y al cambiar el idioma.
+vuelca sus textos (`PageTexts.Apply`) en `OnAppearing` y al cambiar el idioma.
 Las fechas, números y tamaños se formatean con `ILocalizationService.CurrentCulture`.
 
 Para añadir un idioma: añadir el diccionario en `LocalizationService`, incluir el código en
