@@ -97,6 +97,59 @@ public class FileSystemService : IFileSystemService
             return Sort(results, SortMode.NameAscending);
         }, cancellationToken);
 
+    public Task<IReadOnlyList<FileItem>> RecentFilesAsync(string path, int count, bool showHidden, CancellationToken cancellationToken = default) =>
+        Task.Run<IReadOnlyList<FileItem>>(() =>
+        {
+            // Monticulo de minimos con los «count» mas nuevos vistos: el de la cima es el primero que sale.
+            var newest = new PriorityQueue<FileItem, DateTime>();
+            var pending = new Queue<string>();
+            pending.Enqueue(path);
+
+            // Mismo recorrido en anchura que la busqueda, para saltar las carpetas ilegibles.
+            while (pending.Count > 0 && count > 0)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var current = pending.Dequeue();
+
+                IEnumerable<FileSystemInfo> entries;
+                try
+                {
+                    entries = new DirectoryInfo(current).EnumerateFileSystemInfos().ToList();
+                }
+                catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+                {
+                    _logger.LogDebug("Skipping unreadable folder {Path} for recent files: {Message}", current, ex.Message);
+                    continue;
+                }
+
+                foreach (var entry in entries)
+                {
+                    var item = ToItem(entry);
+                    if (item is null || (item.IsHidden && !showHidden))
+                        continue;
+
+                    if (item.IsDirectory)
+                    {
+                        pending.Enqueue(item.FullPath);
+                    }
+                    else if (newest.Count < count)
+                    {
+                        newest.Enqueue(item, item.Modified);
+                    }
+                    else if (newest.TryPeek(out _, out var oldest) && item.Modified > oldest)
+                    {
+                        newest.DequeueEnqueue(item, item.Modified);
+                    }
+                }
+            }
+
+            var result = new List<FileItem>(newest.Count);
+            while (newest.TryDequeue(out var item, out _))
+                result.Add(item);
+            result.Reverse();
+            return result;
+        }, cancellationToken);
+
     public int CountEntries(string directoryPath)
     {
         try

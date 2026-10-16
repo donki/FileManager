@@ -125,6 +125,57 @@ public sealed class FileSystemServiceTests : IDisposable
         Assert.Equal(new[] { "a.txt", "b.txt" }, items.Select(i => i.Name));
     }
 
+    // ---------- RecentFilesAsync ----------
+
+    private void Touch(string path, int minutesAgo) =>
+        File.SetLastWriteTime(path, DateTime.Now.AddMinutes(-minutesAgo));
+
+    [Fact]
+    public async Task Recent_KeepsTheNewestFilesOfAllSubfolders_NewestFirst_WithoutFolders()
+    {
+        Touch(_tmp.File("old.txt"), 50);
+        Touch(_tmp.File("sub/deep/newest.txt"), 1);
+        Touch(_tmp.File("sub/middle.txt"), 10);
+        Touch(_tmp.File("sub/older.txt"), 30);
+        _tmp.Dir("empty");
+
+        var recent = await _fs.RecentFilesAsync(_tmp.Path, 3, showHidden: false);
+
+        Assert.Equal(new[] { "newest.txt", "middle.txt", "older.txt" }, recent.Select(r => r.Name));
+        Assert.All(recent, r => Assert.False(r.IsDirectory));
+    }
+
+    [Fact]
+    public async Task Recent_SkipsHiddenFilesAndFolders_UnlessAsked()
+    {
+        Touch(_tmp.File(".cache/new.tmp"), 1);
+        Touch(_tmp.File(".dot"), 2);
+        Touch(_tmp.File("seen.txt"), 3);
+
+        var visible = await _fs.RecentFilesAsync(_tmp.Path, 10, showHidden: false);
+        var all = await _fs.RecentFilesAsync(_tmp.Path, 10, showHidden: true);
+
+        Assert.Equal(new[] { "seen.txt" }, visible.Select(r => r.Name));
+        Assert.Equal(new[] { "new.tmp", ".dot", "seen.txt" }, all.Select(r => r.Name));
+    }
+
+    [Fact]
+    public async Task Recent_ZeroCountOrMissingFolder_ReturnsEmpty()
+    {
+        _tmp.File("a.txt");
+        Assert.Empty(await _fs.RecentFilesAsync(_tmp.Path, 0, false));
+        Assert.Empty(await _fs.RecentFilesAsync(_tmp.Combine("nope"), 5, false));
+    }
+
+    [Fact]
+    public async Task Recent_Cancelled_Throws()
+    {
+        _tmp.File("a.txt");
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _fs.RecentFilesAsync(_tmp.Path, 5, false, cts.Token));
+    }
+
     // ---------- SearchAsync ----------
 
     [Fact]

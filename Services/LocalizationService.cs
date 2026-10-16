@@ -116,6 +116,7 @@ public class LocalizationService : ILocalizationService
         // Lista
         ["EmptyFolder"] = "This folder is empty",
         ["EmptyFolderHint"] = "Create a folder or paste files here",
+        ["RecentFiles"] = "Recent files",
         ["NoSearchResults"] = "No files match your search",
         ["ItemsCount"] = "{0} items",
         ["OneItem"] = "1 item",
@@ -299,6 +300,7 @@ public class LocalizationService : ILocalizationService
         // Lista
         ["EmptyFolder"] = "Esta carpeta está vacía",
         ["EmptyFolderHint"] = "Crea una carpeta o pega ficheros aquí",
+        ["RecentFiles"] = "Últimos ficheros",
         ["NoSearchResults"] = "Ningún fichero coincide con la búsqueda",
         ["ItemsCount"] = "{0} elementos",
         ["OneItem"] = "1 elemento",

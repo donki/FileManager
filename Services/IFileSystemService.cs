@@ -39,6 +39,12 @@ public interface IFileSystemService
 
     Task<IReadOnlyList<FileItem>> SearchAsync(string path, string query, bool showHidden, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Los <paramref name="count"/> ficheros modificados mas recientemente bajo <paramref name="path"/>
+    /// (recorriendo todas sus subcarpetas), del mas nuevo al mas viejo.
+    /// </summary>
+    Task<IReadOnlyList<FileItem>> RecentFilesAsync(string path, int count, bool showHidden, CancellationToken cancellationToken = default);
+
     /// <summary>Numero de entradas directas de una carpeta, o -1 si no se puede leer.</summary>
     int CountEntries(string directoryPath);
 

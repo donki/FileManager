@@ -37,6 +37,7 @@ public partial class MainPage : ContentPage, IMainView
         _vm = new MainViewModel(files, clipboard, actions, settings, localization, permissions, toast, _dialogs, this, logger);
 
         FilesView.ItemsSource = _vm.Items;
+        BindableLayout.SetItemsSource(RecentBar, _vm.RecentItems);
         _vm.Changed += (_, _) => Render();
         clipboard.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(_vm.UpdatePasteBar);
         _l.LanguageChanged += (_, _) => MainThread.BeginInvokeOnMainThread(async () =>
@@ -98,6 +99,7 @@ public partial class MainPage : ContentPage, IMainView
         PasteLabel.Text = _vm.PasteText;
         Busy.IsVisible = Busy.IsRunning = _vm.IsBusy;
         FileSearchBar.IsVisible = _vm.SearchBarVisible;
+        RecentSection.IsVisible = _vm.RecentVisible;
 
         if (!ReferenceEquals(_drawnBreadcrumb, _vm.Breadcrumb))
             DrawBreadcrumb(_drawnBreadcrumb = _vm.Breadcrumb);
@@ -181,6 +183,18 @@ public partial class MainPage : ContentPage, IMainView
     {
         if (ItemOf(sender) is { } item)
             await _vm.ItemTappedAsync(item);
+    }
+
+    private async void OnRecentTapped(object? sender, EventArgs e)
+    {
+        if (ItemOf(sender) is { } item)
+            await _vm.RecentTappedAsync(item);
+    }
+
+    private async void OnRecentLongPressed(object? sender, EventArgs e)
+    {
+        if (ItemOf(sender) is { } item)
+            await _vm.RecentLongPressedAsync(item);
     }
 
     private async void OnItemMenuClicked(object? sender, EventArgs e)

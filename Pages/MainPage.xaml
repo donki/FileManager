@@ -151,6 +151,59 @@
             <CollectionView x:Name="FilesView"
                             SelectionMode="None"
                             Margin="0,4,0,0">
+                <!-- Ultimos ficheros: franja horizontal arriba de la raiz. Va en la cabecera para que se
+                     desplace con la lista y no le quite sitio al bajar. -->
+                <CollectionView.Header>
+                    <VerticalStackLayout x:Name="RecentSection" IsVisible="False" Padding="0,4,0,4" Spacing="6">
+                        <Label x:Name="RecentTitleLabel"
+                               Margin="16,0"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                            <HorizontalStackLayout x:Name="RecentBar" Padding="12,0" Spacing="8">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FileItem">
+                                        <Border Style="{StaticResource Card}" WidthRequest="136">
+                                            <!-- Toque: abre; pulsacion larga: va a su carpeta. -->
+                                            <VerticalStackLayout Padding="10" Spacing="6">
+                                                <VerticalStackLayout.Behaviors>
+                                                    <helpers:ItemTouchBehavior Tapped="OnRecentTapped"
+                                                                               LongPressed="OnRecentLongPressed" />
+                                                </VerticalStackLayout.Behaviors>
+                                                <Border WidthRequest="44"
+                                                        HeightRequest="44"
+                                                        StrokeThickness="0"
+                                                        HorizontalOptions="Start"
+                                                        BackgroundColor="{AppThemeBinding Light={StaticResource IconTileLight}, Dark={StaticResource IconTileDark}}">
+                                                    <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="22" />
+                                                    </Border.StrokeShape>
+                                                    <Image Source="{Binding Icon}"
+                                                           WidthRequest="24"
+                                                           HeightRequest="24"
+                                                           Aspect="AspectFit"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center" />
+                                                </Border>
+                                                <Label Text="{Binding Name}"
+                                                       FontSize="13"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="2"
+                                                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                                                <Label Text="{Binding Details}"
+                                                       Style="{StaticResource HintText}"
+                                                       FontSize="11"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="2" />
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
+                    </VerticalStackLayout>
+                </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:FileItem">
                         <Grid Padding="12,4">

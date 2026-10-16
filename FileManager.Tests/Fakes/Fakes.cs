@@ -52,6 +52,11 @@ public sealed class RootedFileSystem(string root) : IFileSystemService
         return await _real.SearchAsync(path, query, showHidden, cancellationToken);
     }
 
+    public Exception? RecentError { get; set; }
+
+    public Task<IReadOnlyList<FileItem>> RecentFilesAsync(string path, int count, bool showHidden, CancellationToken cancellationToken = default) =>
+        RecentError is { } e ? Task.FromException<IReadOnlyList<FileItem>>(e) : _real.RecentFilesAsync(path, count, showHidden, cancellationToken);
+
     public int CountEntries(string directoryPath) => _real.CountEntries(directoryPath);
 
     public NameValidation ValidateName(string? name, string parentPath, string? currentPath = null) =>

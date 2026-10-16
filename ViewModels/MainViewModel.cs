@@ -39,7 +39,11 @@ public class MainViewModel
         ["PasteConfirmButton"] = "Paste",
         ["PasteCancelButton"] = "Cancel",
         ["SelectAllButton"] = "SelectAll",
+        ["RecentTitleLabel"] = "RecentFiles",
     };
+
+    /// <summary>Cuantos ficheros recientes se ensenan en la franja de arriba.</summary>
+    public const int RecentCount = 12;
 
     private readonly IFileSystemService _files;
     private readonly IFileClipboardService _clipboard;
@@ -56,6 +60,8 @@ public class MainViewModel
     private readonly List<FileItem> _allItems = new();
 
     private CancellationTokenSource? _searchCts;
+
+    private CancellationTokenSource? _recentCts;
 
     public MainViewModel(
         IFileSystemService files,
@@ -89,6 +95,12 @@ public class MainViewModel
 
     /// <summary>Elementos visibles (con el filtro por tipo aplicado), enlazados a la lista.</summary>
     public ObservableCollection<FileItem> Items { get; } = new();
+
+    /// <summary>Ultimos ficheros modificados de todo el almacenamiento (franja de arriba en la raiz).</summary>
+    public ObservableCollection<FileItem> RecentItems { get; } = new();
+
+    /// <summary>La carga de los recientes en curso (o la ultima); las pruebas la esperan.</summary>
+    public Task RecentTask { get; private set; } = Task.CompletedTask;
 
     // ---------- Estado ----------
 
@@ -143,6 +155,10 @@ public class MainViewModel
     public string PasteText { get; private set; } = string.Empty;
 
     public bool IsBusy { get; private set; }
+
+    /// <summary>Franja de ultimos ficheros: solo en la raiz, fuera de busqueda y seleccion y con algo que ensenar.</summary>
+    public bool RecentVisible =>
+        RecentItems.Count > 0 && FilesVisible && !PermissionVisible && !SearchActive && !SelectMode && IsRoot(CurrentPath);
 
     /// <summary>Ruta de migas de la carpeta actual; cambia de objeto cuando hay que redibujarla.</summary>
     public IReadOnlyList<Crumb> Breadcrumb { get; private set; } = Array.Empty<Crumb>();
@@ -238,6 +254,10 @@ public class MainViewModel
         {
             var items = await _files.ListAsync(path, _settings.ShowHiddenFiles, _settings.Sort);
             Populate(items, isSearch: false);
+
+            // Sin esperar: recorrer todo el almacenamiento tarda y la carpeta ya se ve.
+            if (IsRoot(path))
+                RecentTask = LoadRecentAsync();
         }
         catch (UnauthorizedAccessException)
         {
@@ -253,6 +273,59 @@ public class MainViewModel
         {
             SetBusy(false);
         }
+    }
+
+    /// <summary>Recorre el almacenamiento y rellena <see cref="RecentItems"/>; la lista anterior se queda hasta que llega la nueva.</summary>
+    private async Task LoadRecentAsync()
+    {
+        _recentCts?.Cancel();
+        _recentCts = new CancellationTokenSource();
+        var token = _recentCts.Token;
+
+        try
+        {
+            var recent = await _files.RecentFilesAsync(_files.RootPath, RecentCount, _settings.ShowHiddenFiles, token);
+            if (token.IsCancellationRequested)
+                return;
+
+            RecentItems.Clear();
+            foreach (var item in recent)
+            {
+                item.Icon = FileIcons.For(item);
+                item.Details = DescribeRecent(item);
+                RecentItems.Add(item);
+            }
+            Notify();
+        }
+        catch (OperationCanceledException)
+        {
+            // Sustituida por una carga posterior.
+        }
+        catch (Exception ex)
+        {
+            // La franja es un extra: si falla, se queda como estaba y la carpeta sigue funcionando.
+            _logger.LogError(ex, "Could not load the recent files");
+        }
+    }
+
+    /// <summary>Texto bajo el nombre de un fichero reciente: la fecha y la carpeta en la que esta.</summary>
+    public string DescribeRecent(FileItem item)
+    {
+        var folder = Path.GetDirectoryName(item.FullPath) ?? string.Empty;
+        var place = IsRoot(folder) ? _l["InternalStorage"] : Path.GetFileName(folder);
+        // En dos lineas: con la letra grande, en una sola la carpeta no llegaba a verse.
+        return $"{item.Modified.ToString("d MMM HH:mm", _l.CurrentCulture)}\n{place}";
+    }
+
+    /// <summary>Toque en un reciente: lo abre.</summary>
+    public Task RecentTappedAsync(FileItem item) => OpenFileAsync(item);
+
+    /// <summary>Pulsacion larga en un reciente: va a la carpeta que lo contiene.</summary>
+    public async Task RecentLongPressedAsync(FileItem item)
+    {
+        var folder = Path.GetDirectoryName(item.FullPath);
+        if (!string.IsNullOrEmpty(folder))
+            await LoadAsync(folder);
     }
 
     private void Populate(IReadOnlyList<FileItem> items, bool isSearch)

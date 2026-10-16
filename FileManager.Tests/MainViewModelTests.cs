@@ -1262,6 +1262,83 @@ public sealed class MainViewModelTests : IDisposable
 
     // ---------- Textos fijos ----------
 
+    // ---------- Ultimos ficheros ----------
+
+    [Fact]
+    public async Task Recent_AtTheRoot_ShowsTheNewestFiles_WithFolderAndDate()
+    {
+        File.SetLastWriteTime(_tmp.File("Docs/new.pdf"), DateTime.Now.AddMinutes(-1));
+        File.SetLastWriteTime(_tmp.File("old.txt"), DateTime.Now.AddDays(-2));
+
+        await OpenRootAsync();
+        await _vm.RecentTask;
+
+        Assert.Equal(new[] { "new.pdf", "old.txt" }, _vm.RecentItems.Select(i => i.Name));
+        Assert.EndsWith("Docs", _vm.RecentItems[0].Details);
+        Assert.EndsWith(L("InternalStorage"), _vm.RecentItems[1].Details);
+        Assert.Equal("ic_file_pdf.png", _vm.RecentItems[0].Icon);
+        Assert.True(_vm.RecentVisible);
+    }
+
+    [Fact]
+    public async Task Recent_HiddenInSubfoldersSearchAndSelection()
+    {
+        _tmp.File("Docs/a.txt");
+        await OpenRootAsync();
+        await _vm.RecentTask;
+        Assert.True(_vm.RecentVisible);
+
+        await _vm.LoadAsync(_tmp.Combine("Docs"));
+        Assert.False(_vm.RecentVisible);
+
+        await _vm.LoadAsync(_tmp.Path);
+        _vm.EnterSelectionMode();
+        Assert.False(_vm.RecentVisible);
+        _vm.ExitSelectionMode();
+
+        await _vm.ToggleSearchAsync();
+        Assert.False(_vm.RecentVisible);
+    }
+
+    [Fact]
+    public async Task Recent_NothingToShow_StripStaysHidden()
+    {
+        _tmp.Dir("only-folder");
+        await OpenRootAsync();
+        await _vm.RecentTask;
+
+        Assert.Empty(_vm.RecentItems);
+        Assert.False(_vm.RecentVisible);
+    }
+
+    [Fact]
+    public async Task Recent_Tap_OpensTheFile_LongPress_GoesToItsFolder()
+    {
+        var file = _tmp.File("Docs/Sub/a.txt");
+        await OpenRootAsync();
+        await _vm.RecentTask;
+        var item = _vm.RecentItems.Single();
+
+        await _vm.RecentTappedAsync(item);
+        Assert.Equal(new[] { file }, _actions.Opened);
+
+        await _vm.RecentLongPressedAsync(item);
+        Assert.Equal(_tmp.Combine("Docs", "Sub"), _vm.CurrentPath);
+    }
+
+    [Fact]
+    public async Task Recent_Error_KeepsTheFolderWorking()
+    {
+        _tmp.File("a.txt");
+        _fs.RecentError = new IOException("boom");
+
+        await OpenRootAsync();
+        await _vm.RecentTask;
+
+        Assert.Empty(_vm.RecentItems);
+        Assert.Single(_vm.Items);
+    }
+
     [Fact]
     public void StaticTexts_AllExistInBothLanguages()
     {

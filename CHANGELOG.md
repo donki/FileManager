@@ -4,6 +4,15 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.10.16.1] — 2026-10-16
+
+### Añadido
+- **Últimos ficheros**: en la raíz, arriba de la lista, una franja horizontal con los 12 ficheros
+  modificados más recientemente de todo el almacenamiento (icono, nombre en dos líneas, fecha y carpeta). Un toque
+  abre el fichero; una pulsación larga lleva a su carpeta. Se carga en segundo plano sin frenar el
+  listado, respeta «Mostrar ocultos» y se esconde en las subcarpetas, la búsqueda y la selección.
+- Pruebas: 269 (antes 260).
+
 ## [2026.10.01.0] — 2026-10-01
 
 ### Cambiado
