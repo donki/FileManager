@@ -39,6 +39,7 @@ public class MainViewModel
         ["PasteConfirmButton"] = "Paste",
         ["PasteCancelButton"] = "Cancel",
         ["SelectAllButton"] = "SelectAll",
+        ["SelShareButton"] = "ShareSelected",
         ["RecentTitleLabel"] = "RecentFiles",
     };
 
@@ -631,9 +632,8 @@ public class MainViewModel
 
     public async Task ItemMenuAsync(FileItem item)
     {
-        var options = item.IsDirectory
-            ? new[] { _l["Select"], _l["Open"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] }
-            : new[] { _l["Select"], _l["Open"], _l["Share"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] };
+        // Las carpetas tambien se comparten: van comprimidas en un .zip.
+        var options = new[] { _l["Select"], _l["Open"], _l["Share"], _l["Copy"], _l["Cut"], _l["Rename"], _l["Details"], _l["Delete"] };
 
         var choice = await _dialogs.ActionSheetAsync(item.Name, _l["Cancel"], options);
 
@@ -652,7 +652,7 @@ public class MainViewModel
         }
         else if (choice == _l["Share"])
         {
-            await ShareAsync(item);
+            await ShareAsync(new[] { item });
         }
         else if (choice == _l["Copy"])
         {
@@ -678,17 +678,47 @@ public class MainViewModel
         }
     }
 
-    private async Task ShareAsync(FileItem item)
+    /// <summary>Comparte uno o varios elementos; las carpetas van comprimidas en .zip.</summary>
+    private async Task<bool> ShareAsync(IReadOnlyList<FileItem> items)
     {
+        var title = items.Count == 1
+            ? items[0].Name
+            : string.Format(_l.CurrentCulture, _l["ShareCount"], items.Count);
+
+        // Comprimir una carpeta grande tarda: se ensena el indicador de actividad.
+        var zipping = items.Any(i => i.IsDirectory);
+        if (zipping)
+            SetBusy(true);
         try
         {
-            await _actions.ShareAsync(item.FullPath, item.Name);
+            await _actions.ShareAsync(items.Select(i => i.FullPath).ToArray(), title);
+            return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Could not share the file");
+            _logger.LogError(ex, "Could not share");
             await _dialogs.AlertAsync(_l["Error"], string.Format(_l.CurrentCulture, _l["ErrorShare"], ex.Message), _l["Ok"]);
+            return false;
         }
+        finally
+        {
+            if (zipping)
+                SetBusy(false);
+        }
+    }
+
+    /// <summary>Boton de compartir de la barra de seleccion: comparte todo lo marcado.</summary>
+    public async Task ShareSelectedAsync()
+    {
+        var selected = SelectedItems();
+        if (selected.Count == 0)
+        {
+            _toast.Show(_l["NothingSelected"]);
+            return;
+        }
+
+        if (await ShareAsync(selected))
+            ExitSelectionMode();
     }
 
     private async Task RenameAsync(FileItem item)
@@ -846,9 +876,14 @@ public class MainViewModel
         var choice = await _dialogs.ActionSheetAsync(
             string.Format(_l.CurrentCulture, _l["SelectedCount"], selected.Count),
             _l["Cancel"],
-            _l["Copy"], _l["Cut"], _l["Delete"]);
+            _l["Share"], _l["Copy"], _l["Cut"], _l["Delete"]);
 
-        if (choice == _l["Copy"] || choice == _l["Cut"])
+        if (choice == _l["Share"])
+        {
+            if (await ShareAsync(selected))
+                ExitSelectionMode();
+        }
+        else if (choice == _l["Copy"] || choice == _l["Cut"])
         {
             _clipboard.Set(selected.Select(i => i.FullPath).ToArray(), isMove: choice == _l["Cut"]);
             ExitSelectionMode();

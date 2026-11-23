@@ -105,7 +105,7 @@
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="12" />
             </Border.StrokeShape>
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="4" VerticalOptions="Center">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="4" VerticalOptions="Center">
                 <Button x:Name="SelCloseButton"
                         Grid.Column="0"
                         ImageSource="ic_close_w.png"
@@ -123,16 +123,28 @@
                        FontAttributes="Bold"
                        TextColor="{StaticResource White}"
                        LineBreakMode="TailTruncation" />
-                <Button x:Name="SelectAllButton"
-                        Grid.Column="2"
-                        FontSize="13"
-                        HeightRequest="40"
-                        Padding="10,0"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource White}"
-                        Clicked="OnSelectAllClicked" />
+                <!-- Seleccionar todo, como icono: con texto dejaba sin sitio al contador. -->
+                <ImageButton x:Name="SelectAllButton"
+                             Grid.Column="2"
+                             Source="ic_select_all_w.png"
+                             WidthRequest="40"
+                             HeightRequest="40"
+                             Padding="8"
+                             CornerRadius="20"
+                             BackgroundColor="Transparent"
+                             Clicked="OnSelectAllClicked" />
+                <!-- Compartir lo marcado (ficheros y carpetas, estas en .zip): boton de icono. -->
+                <ImageButton x:Name="SelShareButton"
+                             Grid.Column="3"
+                             Source="ic_share_w.png"
+                             WidthRequest="40"
+                             HeightRequest="40"
+                             Padding="8"
+                             CornerRadius="20"
+                             BackgroundColor="Transparent"
+                             Clicked="OnShareSelectedClicked" />
                 <Button x:Name="SelActionsButton"
-                        Grid.Column="3"
+                        Grid.Column="4"
                         Text="⋮"
                         FontSize="20"
                         FontAttributes="Bold"

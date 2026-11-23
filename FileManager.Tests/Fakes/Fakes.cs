@@ -158,7 +158,7 @@ public sealed class FakeActions : IFileActionsService
     public Exception? OpenError { get; set; }
     public Exception? ShareError { get; set; }
     public List<string> Opened { get; } = new();
-    public List<(string Path, string Title)> Shared { get; } = new();
+    public List<(string[] Paths, string Title)> Shared { get; } = new();
 
     public Task<bool> OpenAsync(string path)
     {
@@ -168,11 +168,11 @@ public sealed class FakeActions : IFileActionsService
         return Task.FromResult(OpenResult);
     }
 
-    public Task ShareAsync(string path, string title)
+    public Task ShareAsync(IReadOnlyList<string> paths, string title)
     {
         if (ShareError is { } e)
             throw e;
-        Shared.Add((path, title));
+        Shared.Add((paths.ToArray(), title));
         return Task.CompletedTask;
     }
 }

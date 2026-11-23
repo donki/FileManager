@@ -72,4 +72,19 @@ public static class MimeTypes
         var extension = Path.GetExtension(path).TrimStart('.');
         return Map.TryGetValue(extension, out var mime) ? mime : Default;
     }
+
+    /// <summary>
+    /// Tipo que vale para todos los ficheros a la vez (intent de compartir varios): el mismo si
+    /// coinciden, <c>image/*</c> si solo comparten la familia y <c>*/*</c> si no.
+    /// </summary>
+    public static string Common(IEnumerable<string> paths)
+    {
+        var types = paths.Select(ForPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        if (types.Count == 0)
+            return "*/*";
+        if (types.Count == 1)
+            return types[0];
+        var families = types.Select(t => t.Split('/')[0]).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        return families.Count == 1 ? families[0] + "/*" : "*/*";
+    }
 }

@@ -214,6 +214,8 @@ public partial class MainPage : ContentPage, IMainView
 
     private async void OnBatchActionsClicked(object? sender, EventArgs e) => await _vm.BatchActionsAsync();
 
+    private async void OnShareSelectedClicked(object? sender, EventArgs e) => await _vm.ShareSelectedAsync();
+
     private async void OnNewFolderClicked(object? sender, EventArgs e) => await _vm.NewFolderAsync();
 
     private void OnCancelPasteClicked(object? sender, EventArgs e) => _vm.CancelPaste();

@@ -592,15 +592,15 @@ public sealed class MainViewModelTests : IDisposable
     // ---------- Menu de un elemento ----------
 
     [Fact]
-    public async Task ItemMenu_FolderHasNoShare_FileHasIt()
+    public async Task ItemMenu_FoldersAndFilesHaveShare()
     {
         _tmp.File("a.txt");
         _tmp.Dir("D");
         await OpenRootAsync();
 
         await _vm.ItemMenuAsync(Item("D"));
-        Assert.DoesNotContain(L("Share"), _dialogs.Last.Options);
-        Assert.Equal(7, _dialogs.Last.Options.Length);
+        Assert.Contains(L("Share"), _dialogs.Last.Options);
+        Assert.Equal(8, _dialogs.Last.Options.Length);
 
         await _vm.ItemMenuAsync(Item("a.txt"));
         Assert.Contains(L("Share"), _dialogs.Last.Options);
@@ -646,12 +646,82 @@ public sealed class MainViewModelTests : IDisposable
 
         _dialogs.Answer(L("Share"));
         await _vm.ItemMenuAsync(Item("a.txt"));
-        Assert.Equal((file, "a.txt"), Assert.Single(_actions.Shared));
+        var shared = Assert.Single(_actions.Shared);
+        Assert.Equal(new[] { file }, shared.Paths);
+        Assert.Equal("a.txt", shared.Title);
 
         _actions.ShareError = new InvalidOperationException("nope");
         _dialogs.Answer(L("Share"));
         await _vm.ItemMenuAsync(Item("a.txt"));
         Assert.Equal(string.Format(L("ErrorShare"), "nope"), _dialogs.Last.Message);
+        Assert.False(_vm.IsBusy);
+    }
+
+    [Fact]
+    public async Task ItemMenu_Share_AFolder_SendsItsPath()
+    {
+        var dir = _tmp.Dir("D");
+        await OpenRootAsync();
+
+        _dialogs.Answer(L("Share"));
+        await _vm.ItemMenuAsync(Item("D"));
+
+        var shared = Assert.Single(_actions.Shared);
+        Assert.Equal(new[] { dir }, shared.Paths);
+        Assert.Equal("D", shared.Title);
+        Assert.False(_vm.IsBusy);
+    }
+
+    [Fact]
+    public async Task ShareSelected_SharesAllMarked_AndLeavesSelection()
+    {
+        var a = _tmp.File("a.txt");
+        var d = _tmp.Dir("D");
+        _tmp.File("keep.txt");
+        await OpenRootAsync();
+        _vm.ItemLongPressed(Item("a.txt"));
+        _vm.ItemLongPressed(Item("D"));
+
+        await _vm.ShareSelectedAsync();
+
+        var shared = Assert.Single(_actions.Shared);
+        Assert.Equal(new[] { d, a }.OrderBy(p => p), shared.Paths.OrderBy(p => p));
+        Assert.Equal(string.Format(L("ShareCount"), 2), shared.Title);
+        Assert.False(_vm.SelectMode);
+    }
+
+    [Fact]
+    public async Task ShareSelected_WithNothing_Says_AndOnError_KeepsSelection()
+    {
+        _tmp.File("a.txt");
+        await OpenRootAsync();
+        _vm.EnterSelectionMode();
+
+        await _vm.ShareSelectedAsync();
+        Assert.Equal(new[] { L("NothingSelected") }, _toast.Shown);
+        Assert.Empty(_actions.Shared);
+
+        _vm.SelectAll();
+        _actions.ShareError = new IOException("full");
+        await _vm.ShareSelectedAsync();
+        Assert.Equal(string.Format(L("ErrorShare"), "full"), _dialogs.Last.Message);
+        Assert.True(_vm.SelectMode);
+    }
+
+    [Fact]
+    public async Task Batch_Share_SharesTheSelection()
+    {
+        var a = _tmp.File("a.txt");
+        var b = _tmp.File("b.txt");
+        await OpenRootAsync();
+        _vm.EnterSelectionMode();
+        _vm.SelectAll();
+
+        _dialogs.Answer(L("Share"));
+        await _vm.BatchActionsAsync();
+
+        Assert.Equal(new[] { a, b }, Assert.Single(_actions.Shared).Paths);
+        Assert.False(_vm.SelectMode);
     }
 
     [Fact]

@@ -30,7 +30,7 @@ git clone --recurse-submodules https://github.com/donki/FileManager.git
 - Portapapeles de ficheros: copiar en una carpeta y pegar en otra
 - Resolución de conflictos al pegar: **reemplazar** o **conservar ambos**
 - **Abrir** ficheros con la aplicación asociada del sistema
-- **Compartir** ficheros con cualquier aplicación
+- **Compartir** ficheros y carpetas (en `.zip`), uno o varios a la vez, con cualquier aplicación
 - **Detalles**: nombre, ruta, tipo MIME, tamaño y fecha de modificación
 
 ### 🔍 Búsqueda

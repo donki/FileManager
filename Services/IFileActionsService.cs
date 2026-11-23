@@ -7,5 +7,9 @@ public interface IFileActionsService
     /// <returns><c>false</c> si ninguna aplicacion puede abrir ese tipo de fichero.</returns>
     Task<bool> OpenAsync(string path);
 
-    Task ShareAsync(string path, string title);
+    /// <summary>
+    /// Abre el selector de compartir del sistema con uno o varios ficheros y carpetas
+    /// (las carpetas se envian comprimidas en .zip).
+    /// </summary>
+    Task ShareAsync(IReadOnlyList<string> paths, string title);
 }

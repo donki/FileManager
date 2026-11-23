@@ -40,6 +40,7 @@
     <Compile Include="..\Helpers\FileIcons.cs" Link="App\Helpers\FileIcons.cs" />
     <Compile Include="..\Helpers\MimeTypes.cs" Link="App\Helpers\MimeTypes.cs" />
     <Compile Include="..\Helpers\SizeFormatter.cs" Link="App\Helpers\SizeFormatter.cs" />
+    <Compile Include="..\Helpers\SharePreparer.cs" Link="App\Helpers\SharePreparer.cs" />
     <Compile Include="..\Services\IFileSystemService.cs" Link="App\Services\IFileSystemService.cs" />
     <Compile Include="..\Services\FileSystemService.cs" Link="App\Services\FileSystemService.cs" />
     <Compile Include="..\Services\IFileClipboardService.cs" Link="App\Services\IFileClipboardService.cs" />

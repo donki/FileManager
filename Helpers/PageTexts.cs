@@ -17,6 +17,8 @@ public static class PageTexts
                 case SearchBar search: search.Placeholder = l[key]; break;
                 case Label label: label.Text = l[key]; break;
                 case Button button: button.Text = l[key]; break;
+                // Botones de solo icono: el texto va a la descripcion accesible (lector de pantalla).
+                case ImageButton icon: SemanticProperties.SetDescription(icon, l[key]); break;
                 default: throw new InvalidOperationException($"No text control named '{name}'.");
             }
         }

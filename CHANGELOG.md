@@ -4,6 +4,17 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.11.23.0] — 2026-11-23
+
+### Añadido
+- **Compartir ficheros y carpetas**: «Compartir» está ahora también en el menú de las carpetas, en las
+  acciones de la selección múltiple y como botón de icono en la barra de selección. Uno o varios
+  elementos a la vez abren el selector de compartir de Android (ACTION_SEND / ACTION_SEND_MULTIPLE
+  con URIs `content://` del FileProvider, sin copiar el fichero) con el tipo MIME común de todos
+  (`image/*` si son imágenes distintas, `*/*` si se mezclan). Las carpetas se envían comprimidas en
+  un `.zip` temporal en la caché de la aplicación, que se borra al compartir la siguiente vez.
+- Pruebas: 285 (antes 269).
+
 ## [2026.10.16.1] — 2026-10-16
 
 ### Añadido
