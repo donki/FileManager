@@ -15,6 +15,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
   un `.zip` temporal en la caché de la aplicación, que se borra al compartir la siguiente vez.
 - Pruebas: 285 (antes 269).
 
+### Cambiado
+- «Seleccionar todo» de la barra de selección pasa a botón de icono (con texto dejaba cortado el
+  contador de seleccionados).
+
 ## [2026.10.16.1] — 2026-10-16
 
 ### Añadido
