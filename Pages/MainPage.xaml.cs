@@ -93,6 +93,7 @@ public partial class MainPage : ContentPage, IMainView
         EmptyHintLabel.IsVisible = _vm.EmptyHintVisible;
         NewFolderButton.IsVisible = _vm.NewFolderVisible;
         SearchButton.IsVisible = _vm.SearchButtonVisible;
+        StorageButton.IsVisible = _vm.StorageVisible;
         SelectionBar.IsVisible = _vm.SelectionBarVisible;
         SelCountLabel.Text = _vm.SelectionCountText;
         PasteBar.IsVisible = _vm.PasteBarVisible;
@@ -202,6 +203,8 @@ public partial class MainPage : ContentPage, IMainView
         if (ItemOf(sender) is { } item)
             await _vm.ItemMenuAsync(item);
     }
+
+    private async void OnStorageClicked(object? sender, EventArgs e) => await _vm.ShowStorageMenuAsync();
 
     private async void OnSearchToggleClicked(object? sender, EventArgs e) => await _vm.ToggleSearchAsync();
 

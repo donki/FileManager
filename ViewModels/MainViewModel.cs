@@ -64,6 +64,9 @@ public class MainViewModel
 
     private CancellationTokenSource? _recentCts;
 
+    /// <summary>Memorias montadas (la interna, la primera); se repregunta en cada carga.</summary>
+    private IReadOnlyList<StorageVolume> _volumes;
+
     public MainViewModel(
         IFileSystemService files,
         IFileClipboardService clipboard,
@@ -89,6 +92,7 @@ public class MainViewModel
 
         CurrentPath = _files.RootPath;
         EmptyTitle = _l["EmptyFolder"];
+        _volumes = _files.GetVolumes();
     }
 
     /// <summary>Algo del estado de la pantalla ha cambiado: la pagina lo vuelve a volcar.</summary>
@@ -126,6 +130,9 @@ public class MainViewModel
 
     public bool UpVisible { get; private set; }
 
+    /// <summary>Boton de memorias: solo si hay mas de una (tarjeta SD metida) y fuera de la seleccion.</summary>
+    public bool StorageVisible => _volumes.Count > 1 && !SelectMode;
+
     public bool PermissionVisible { get; private set; }
 
     public bool FilesVisible { get; private set; } = true;
@@ -159,7 +166,7 @@ public class MainViewModel
 
     /// <summary>Franja de ultimos ficheros: solo en la raiz, fuera de busqueda y seleccion y con algo que ensenar.</summary>
     public bool RecentVisible =>
-        RecentItems.Count > 0 && FilesVisible && !PermissionVisible && !SearchActive && !SelectMode && IsRoot(CurrentPath);
+        RecentItems.Count > 0 && FilesVisible && !PermissionVisible && !SearchActive && !SelectMode && IsInternalRoot(CurrentPath);
 
     /// <summary>Ruta de migas de la carpeta actual; cambia de objeto cuando hay que redibujarla.</summary>
     public IReadOnlyList<Crumb> Breadcrumb { get; private set; } = Array.Empty<Crumb>();
@@ -241,9 +248,12 @@ public class MainViewModel
 
     public async Task LoadAsync(string path)
     {
+        // La tarjeta SD se puede meter o sacar con la app abierta.
+        _volumes = _files.GetVolumes();
+
         if (!Directory.Exists(path))
         {
-            // La carpeta pudo borrarse desde otra app mientras estabamos dentro.
+            // La carpeta pudo borrarse desde otra app mientras estabamos dentro (o sacarse la tarjeta).
             _logger.LogInformation("Current folder no longer exists, falling back to the root");
             path = _files.RootPath;
         }
@@ -257,7 +267,7 @@ public class MainViewModel
             Populate(items, isSearch: false);
 
             // Sin esperar: recorrer todo el almacenamiento tarda y la carpeta ya se ve.
-            if (IsRoot(path))
+            if (IsInternalRoot(path))
                 RecentTask = LoadRecentAsync();
         }
         catch (UnauthorizedAccessException)
@@ -313,7 +323,7 @@ public class MainViewModel
     public string DescribeRecent(FileItem item)
     {
         var folder = Path.GetDirectoryName(item.FullPath) ?? string.Empty;
-        var place = IsRoot(folder) ? _l["InternalStorage"] : Path.GetFileName(folder);
+        var place = IsRoot(folder) ? VolumeLabel(VolumeOf(folder)) : Path.GetFileName(folder);
         // En dos lineas: con la letra grande, en una sola la carpeta no llegaba a verse.
         return $"{item.Modified.ToString("d MMM HH:mm", _l.CurrentCulture)}\n{place}";
     }
@@ -433,7 +443,7 @@ public class MainViewModel
     private void UpdateHeader()
     {
         var isRoot = IsRoot(CurrentPath);
-        Title = isRoot ? _l["InternalStorage"] : Path.GetFileName(CurrentPath);
+        Title = isRoot ? VolumeLabel(VolumeOf(CurrentPath)) : Path.GetFileName(CurrentPath);
         UpVisible = !isRoot;
 
         var count = Items.Count switch
@@ -451,15 +461,60 @@ public class MainViewModel
 
     // ============ Navegacion ============
 
-    public bool IsRoot(string path) =>
-        string.Equals(Path.TrimEndingDirectorySeparator(path),
-                      Path.TrimEndingDirectorySeparator(_files.RootPath),
-                      StringComparison.OrdinalIgnoreCase);
+    private static bool SamePath(string a, string b) =>
+        string.Equals(Path.TrimEndingDirectorySeparator(a), Path.TrimEndingDirectorySeparator(b), StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Raiz de una memoria (la interna o una tarjeta SD).</summary>
+    public bool IsRoot(string path) => _volumes.Any(v => SamePath(path, v.RootPath));
+
+    private bool IsInternalRoot(string path) => SamePath(path, _files.RootPath);
+
+    /// <summary>Memoria en la que esta una ruta; si no esta en ninguna conocida, la interna.</summary>
+    private StorageVolume VolumeOf(string path)
+    {
+        var trimmed = Path.TrimEndingDirectorySeparator(path);
+        return _volumes
+            .Where(v =>
+            {
+                var root = Path.TrimEndingDirectorySeparator(v.RootPath);
+                return SamePath(trimmed, root) || trimmed.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+            })
+            .OrderByDescending(v => v.RootPath.Length)
+            .FirstOrDefault() ?? _volumes[0];
+    }
+
+    /// <summary>Nombre de una memoria: «Almacenamiento interno», «Tarjeta SD» y, si hay varias, numeradas.</summary>
+    public string VolumeLabel(StorageVolume volume)
+    {
+        if (!volume.IsRemovable)
+            return _l["InternalStorage"];
+
+        var removable = _volumes.Where(v => v.IsRemovable).ToList();
+        var index = removable.FindIndex(v => SamePath(v.RootPath, volume.RootPath));
+        return removable.Count > 1 && index >= 0 ? $"{_l["SdCard"]} {index + 1}" : _l["SdCard"];
+    }
+
+    /// <summary>Boton de memorias: elegir entre la interna y las tarjetas SD y saltar a su raiz.</summary>
+    public async Task ShowStorageMenuAsync()
+    {
+        _volumes = _files.GetVolumes();
+        var options = _volumes.Select(v => (Label: VolumeLabel(v), v.RootPath)).ToArray();
+
+        var choice = await _dialogs.ActionSheetAsync(_l["Storage"], _l["Cancel"], options.Select(o => o.Label).ToArray());
+        var target = options.FirstOrDefault(o => o.Label == choice);
+        if (target.RootPath is null)
+            return;
+
+        if (SearchActive)
+            ExitSearch();
+        await LoadAsync(target.RootPath);
+    }
 
     private void BuildBreadcrumb()
     {
-        var root = Path.TrimEndingDirectorySeparator(_files.RootPath);
-        var segments = new List<(string Label, string Path)> { (_l["InternalStorage"], root) };
+        var volume = VolumeOf(CurrentPath);
+        var root = Path.TrimEndingDirectorySeparator(volume.RootPath);
+        var segments = new List<(string Label, string Path)> { (VolumeLabel(volume), root) };
 
         if (!IsRoot(CurrentPath) && CurrentPath.StartsWith(root, StringComparison.OrdinalIgnoreCase))
         {
@@ -508,6 +563,10 @@ public class MainViewModel
         // El boton atras de Android sube una carpeta en lugar de cerrar la aplicacion.
         if (SearchActive || !IsRoot(CurrentPath))
             return NavigateUpAsync;
+
+        // En la raiz de la tarjeta SD, atras vuelve a la memoria interna antes de salir.
+        if (!IsInternalRoot(CurrentPath))
+            return () => LoadAsync(_files.RootPath);
 
         return null;
     }

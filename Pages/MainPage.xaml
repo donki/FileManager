@@ -12,7 +12,7 @@
         <!-- ============ Barra superior ============ -->
         <VerticalStackLayout Grid.Row="0" BackgroundColor="{StaticResource Primary}" Spacing="0">
 
-            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Padding="8,6" ColumnSpacing="2">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" Padding="8,6" ColumnSpacing="2">
 
                 <!-- Menu hamburguesa: abre el flyout de Shell (constitucion A.9). -->
                 <ImageButton x:Name="MenuButton"
@@ -50,8 +50,21 @@
                            LineBreakMode="TailTruncation" />
                 </VerticalStackLayout>
 
-                <ImageButton x:Name="SearchButton"
+                <!-- Memorias: solo con una tarjeta SD metida; cambia entre la interna y la tarjeta. -->
+                <ImageButton x:Name="StorageButton"
                              Grid.Column="3"
+                             Source="ic_sd_card_w.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             IsVisible="False"
+                             Clicked="OnStorageClicked" />
+
+                <ImageButton x:Name="SearchButton"
+                             Grid.Column="4"
                              Source="ic_search.png"
                              BackgroundColor="Transparent"
                              WidthRequest="44"
@@ -62,7 +75,7 @@
                              Clicked="OnSearchToggleClicked" />
 
                 <ImageButton x:Name="MoreButton"
-                             Grid.Column="4"
+                             Grid.Column="5"
                              Source="ic_more.png"
                              BackgroundColor="Transparent"
                              WidthRequest="44"

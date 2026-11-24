@@ -34,6 +34,14 @@ public sealed class RootedFileSystem(string root) : IFileSystemService
 
     public string RootPath { get; set; } = root;
 
+    /// <summary>Memorias extraibles (tarjetas SD) que se anaden a la interna.</summary>
+    public List<string> RemovableRoots { get; } = new();
+
+    public IReadOnlyList<StorageVolume> GetVolumes() =>
+        new[] { new StorageVolume(RootPath, false) }
+            .Concat(RemovableRoots.Where(Directory.Exists).Select(r => new StorageVolume(r, true)))
+            .ToList();
+
     public async Task<IReadOnlyList<FileItem>> ListAsync(string path, bool showHidden, SortMode sort, CancellationToken cancellationToken = default)
     {
         ListCalls++;

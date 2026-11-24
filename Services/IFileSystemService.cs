@@ -35,6 +35,12 @@ public interface IFileSystemService
     /// <summary>Raiz del almacenamiento interno del dispositivo.</summary>
     string RootPath { get; }
 
+    /// <summary>
+    /// Memorias montadas ahora mismo: la interna (<see cref="RootPath"/>) la primera y detras las
+    /// extraibles (tarjeta SD). Se vuelve a preguntar cada vez: la tarjeta se puede sacar o meter.
+    /// </summary>
+    IReadOnlyList<StorageVolume> GetVolumes();
+
     Task<IReadOnlyList<FileItem>> ListAsync(string path, bool showHidden, SortMode sort, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<FileItem>> SearchAsync(string path, string query, bool showHidden, CancellationToken cancellationToken = default);

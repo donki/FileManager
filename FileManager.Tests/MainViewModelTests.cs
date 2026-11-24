@@ -1409,6 +1409,104 @@ public sealed class MainViewModelTests : IDisposable
         Assert.Single(_vm.Items);
     }
 
+    // ---------- Tarjeta SD ----------
+
+    [Fact]
+    public async Task Storage_WithoutSdCard_HidesTheButton()
+    {
+        await OpenRootAsync();
+        Assert.False(_vm.StorageVisible);
+    }
+
+    [Fact]
+    public async Task Storage_PickSdCard_OpensItsRoot()
+    {
+        using var sd = new TempFolder();
+        sd.Dir("Music");
+        _fs.RemovableRoots.Add(sd.Path);
+        await OpenRootAsync();
+        Assert.True(_vm.StorageVisible);
+
+        _dialogs.Answer(L("SdCard"));
+        await _vm.ShowStorageMenuAsync();
+
+        Assert.Equal(new[] { L("InternalStorage"), L("SdCard") }, _dialogs.Last.Options);
+        Assert.Equal(sd.Path, _vm.CurrentPath);
+        Assert.Equal(L("SdCard"), _vm.Title);
+        Assert.False(_vm.UpVisible);
+        Assert.False(_vm.RecentVisible);
+        Assert.Equal(L("SdCard"), _vm.Breadcrumb[0].Label);
+        Assert.Contains(_vm.Items, i => i.Name == "Music");
+    }
+
+    [Fact]
+    public async Task Storage_SubfolderOfSdCard_BreadcrumbStartsAtTheCard_AndBackReturnsToInternal()
+    {
+        using var sd = new TempFolder();
+        var music = sd.Dir("Music");
+        _fs.RemovableRoots.Add(sd.Path);
+        await OpenRootAsync();
+
+        await _vm.LoadAsync(music);
+        Assert.Equal(new[] { L("SdCard"), "Music" }, _vm.Breadcrumb.Select(c => c.Label));
+        Assert.Equal(sd.Path, _vm.Breadcrumb[0].Path);
+
+        await _vm.BackAction()!();
+        Assert.Equal(sd.Path, _vm.CurrentPath);
+
+        // En la raiz de la tarjeta, atras vuelve a la memoria interna; alli ya no lo atiende.
+        await _vm.BackAction()!();
+        Assert.Equal(_tmp.Path, _vm.CurrentPath);
+        Assert.Null(_vm.BackAction());
+    }
+
+    [Fact]
+    public async Task Storage_MoveFileFromInternalToSdCard()
+    {
+        using var sd = new TempFolder();
+        var song = _tmp.File("song.mp3", "la");
+        _fs.RemovableRoots.Add(sd.Path);
+        await OpenRootAsync();
+
+        _dialogs.Answer(L("Cut"), L("SdCard"));
+        await _vm.ItemMenuAsync(Item("song.mp3"));
+        await _vm.ShowStorageMenuAsync();
+        await _vm.PasteAsync();
+
+        Assert.False(File.Exists(song));
+        Assert.Equal("la", File.ReadAllText(Path.Combine(sd.Path, "song.mp3")));
+        Assert.Contains(_vm.Items, i => i.Name == "song.mp3");
+    }
+
+    [Fact]
+    public async Task Storage_SdCardRemovedWhileInside_FallsBackToInternal()
+    {
+        var sd = new TempFolder();
+        _fs.RemovableRoots.Add(sd.Path);
+        await OpenRootAsync();
+        await _vm.LoadAsync(sd.Path);
+
+        sd.Dispose();
+        await _vm.LoadAsync(_vm.CurrentPath);
+
+        Assert.Equal(_tmp.Path, _vm.CurrentPath);
+        Assert.False(_vm.StorageVisible);
+    }
+
+    [Fact]
+    public async Task Storage_TwoCards_AreNumbered()
+    {
+        using var a = new TempFolder();
+        using var b = new TempFolder();
+        _fs.RemovableRoots.Add(a.Path);
+        _fs.RemovableRoots.Add(b.Path);
+        await OpenRootAsync();
+
+        await _vm.ShowStorageMenuAsync();
+
+        Assert.Equal(new[] { L("InternalStorage"), L("SdCard") + " 1", L("SdCard") + " 2" }, _dialogs.Last.Options);
+    }
+
     [Fact]
     public void StaticTexts_AllExistInBothLanguages()
     {

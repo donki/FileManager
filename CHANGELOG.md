@@ -4,7 +4,15 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [2026.11.23.0] — 2026-11-23
+## [2026.11.24.0] — 2026-11-24
+
+### Añadido
+- **Tarjeta SD**: con una tarjeta SD (u otra memoria extraíble) metida, aparece un botón de icono
+  en la barra de arriba para cambiar entre «Almacenamiento interno» y «Tarjeta SD». Se puede
+  explorar, copiar y mover entre las dos (mover entre memorias copia y borra el original). El
+  título y la ruta de migas empiezan por el nombre de la memoria; en la raíz de la tarjeta, atrás
+  vuelve a la memoria interna. Si se saca la tarjeta estando dentro, se vuelve a la interna.
+- Pruebas: 291 (antes 285).
 
 ### Añadido
 - **Compartir ficheros y carpetas**: «Compartir» está ahora también en el menú de las carpetas, en las

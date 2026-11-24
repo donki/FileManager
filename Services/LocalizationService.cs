@@ -91,6 +91,8 @@ public class LocalizationService : ILocalizationService
 
         // Navegacion y barra superior
         ["InternalStorage"] = "Internal storage",
+        ["SdCard"] = "SD card",
+        ["Storage"] = "Storage",
         ["Home"] = "Home",
         ["Menu"] = "Menu",
         ["Search"] = "Search",
@@ -277,6 +279,8 @@ public class LocalizationService : ILocalizationService
 
         // Navegacion y barra superior
         ["InternalStorage"] = "Almacenamiento interno",
+        ["SdCard"] = "Tarjeta SD",
+        ["Storage"] = "Almacenamiento",
         ["Home"] = "Inicio",
         ["Menu"] = "Menú",
         ["Search"] = "Buscar",

@@ -27,6 +27,42 @@ public class FileSystemService : IFileSystemService
         }
     }
 
+    public IReadOnlyList<StorageVolume> GetVolumes()
+    {
+        var internalRoot = RootPath;
+        var volumes = new List<StorageVolume> { new(internalRoot, IsRemovable: false) };
+
+#if ANDROID
+        try
+        {
+            // GetExternalFilesDirs devuelve la carpeta privada de la app en cada memoria montada
+            // (.../Android/data/<paquete>/files); la raiz de la memoria es lo que va antes de
+            // /Android/. Funciona desde la API 19 y no necesita reflexion sobre StorageVolume.
+            var dirs = Android.App.Application.Context.GetExternalFilesDirs(null) ?? Array.Empty<Java.IO.File>();
+            foreach (var dir in dirs)
+            {
+                var path = dir?.AbsolutePath;
+                var cut = path?.IndexOf("/Android/", StringComparison.Ordinal) ?? -1;
+                if (path is null || cut <= 0)
+                    continue;
+
+                var root = path[..cut];
+                if (volumes.Any(v => string.Equals(v.RootPath, root, StringComparison.OrdinalIgnoreCase)) || !Directory.Exists(root))
+                    continue;
+
+                volumes.Add(new StorageVolume(root, IsRemovable: true));
+            }
+        }
+        catch (Exception ex)
+        {
+            // Sin la lista de memorias se sigue con la interna, que es lo que habia antes.
+            _logger.LogWarning(ex, "Could not list the storage volumes");
+        }
+#endif
+
+        return volumes;
+    }
+
     public Task<IReadOnlyList<FileItem>> ListAsync(string path, bool showHidden, SortMode sort, CancellationToken cancellationToken = default) =>
         Task.Run<IReadOnlyList<FileItem>>(() =>
         {
