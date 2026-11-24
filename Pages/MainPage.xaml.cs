@@ -102,6 +102,12 @@ public partial class MainPage : ContentPage, IMainView
         FileSearchBar.IsVisible = _vm.SearchBarVisible;
         RecentSection.IsVisible = _vm.RecentVisible;
 
+        // En Android la cabecera de un CollectionView guarda su alto aunque este oculta y dejaba un
+        // hueco encima de la lista: fuera de la raiz se quita la cabecera entera.
+        var header = _vm.RecentVisible ? RecentSection : null;
+        if (!ReferenceEquals(FilesView.Header, header))
+            FilesView.Header = header;
+
         if (!ReferenceEquals(_drawnBreadcrumb, _vm.Breadcrumb))
             DrawBreadcrumb(_drawnBreadcrumb = _vm.Breadcrumb);
 

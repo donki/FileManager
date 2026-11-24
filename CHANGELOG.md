@@ -4,6 +4,12 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2026.11.24.1] — 2026-11-24
+
+### Corregido
+- Fuera de la raíz quedaba un hueco vacío encima de la lista: la franja de «Últimos ficheros»
+  estaba oculta pero Android le guardaba el alto. Ahora se quita la cabecera entera.
+
 ## [2026.11.24.0] — 2026-11-24
 
 ### Añadido
