@@ -1,7 +1,10 @@
 # Pruebas con cobertura (constitucion General 8.6). Uso, desde cualquier carpeta:
 #   pwsh FileManager.Tests/cobertura.ps1
-# Compila, pasa las pruebas con coverlet, resume con ReportGenerator (dotnet tool local del repo)
-# y da las dos cifras: cobertura de lo instrumentado y cobertura sobre toda la app.
+# Compila y pasa el banco con coverlet (net10.0: logica, paginas, Shell, arranque y adaptadores),
+# resume con ReportGenerator (dotnet tool local del repo) y da las dos cifras: cobertura de lo
+# instrumentado y cobertura de toda la app, que cuenta solo codigo ejecutable (General 8.6,
+# 2026-11-25) con el script comun Mobile/Shared/cobertura-app.py; lo que el banco no compila
+# (Platforms/Android y los bloques #if ANDROID) entra estimado y sin cubrir.
 $ErrorActionPreference = 'Stop'
 $tests = $PSScriptRoot
 $repo = Split-Path $tests
@@ -17,36 +20,13 @@ $code = $LASTEXITCODE
 $watch.Stop()
 "Tiempo del banco de pruebas (dotnet test --no-build): {0:N1} s" -f $watch.Elapsed.TotalSeconds
 
-$xml = Get-ChildItem $results -Recurse -Filter coverage.cobertura.xml | Select-Object -First 1
+$xml = (Get-ChildItem $results -Recurse -Filter coverage.cobertura.xml | Select-Object -First 1).FullName
 Push-Location $repo
 try {
     dotnet tool restore | Out-Null
-    dotnet reportgenerator "-reports:$($xml.FullName)" "-targetdir:$results/report" -reporttypes:TextSummary | Out-Null
+    dotnet reportgenerator "-reports:$xml" "-targetdir:$results/report" -reporttypes:TextSummary | Out-Null
 } finally { Pop-Location }
 Get-Content "$results/report/Summary.txt" | Select-Object -First 12
 
-# Lineas cubiertas (sin repetir fichero+linea) frente a las lineas de codigo C# de toda la app:
-# sin obj/bin, pruebas, constitucion, generados (*.g.cs, *.Designer.cs); no vacias ni comentarios.
-[xml]$cov = Get-Content $xml.FullName
-$covered = @{}
-foreach ($class in $cov.coverage.packages.package.classes.class) {
-    foreach ($line in $class.lines.line) {
-        if ([int]$line.hits -gt 0) { $covered["$($class.filename)|$($line.number)"] = 1 }
-    }
-}
-$total = 0
-Get-ChildItem $repo -Recurse -Filter *.cs | Where-Object {
-    $_.FullName -notmatch '\\(obj|bin|constitution|[^\\]+\.Tests)\\' -and
-    $_.Name -notmatch '\.(g|Designer)\.cs$'
-} | ForEach-Object {
-    $inBlock = $false
-    foreach ($l in Get-Content $_.FullName) {
-        $t = $l.Trim()
-        if ($inBlock) { if ($t -match '\*/') { $inBlock = $false }; continue }
-        if ($t -eq '' -or $t.StartsWith('//')) { continue }
-        if ($t.StartsWith('/*')) { if ($t -notmatch '\*/') { $inBlock = $true }; continue }
-        $total++
-    }
-}
-"Cobertura sobre toda la app: {0} de {1} lineas = {2:N1} %" -f $covered.Count, $total, (100.0 * $covered.Count / $total)
+python (Join-Path $repo '..\Shared\cobertura-app.py') --app $repo --report $xml --defines '' @args
 exit $code

@@ -39,8 +39,8 @@ public partial class MainPage : ContentPage, IMainView
         FilesView.ItemsSource = _vm.Items;
         BindableLayout.SetItemsSource(RecentBar, _vm.RecentItems);
         _vm.Changed += (_, _) => Render();
-        clipboard.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(_vm.UpdatePasteBar);
-        _l.LanguageChanged += (_, _) => MainThread.BeginInvokeOnMainThread(async () =>
+        clipboard.Changed += (_, _) => Dispatcher.Dispatch(_vm.UpdatePasteBar);
+        _l.LanguageChanged += (_, _) => Dispatcher.Dispatch(async () =>
         {
             PageTexts.Apply(this, MainViewModel.StaticTexts, _l);
             await _vm.LanguageChangedAsync();

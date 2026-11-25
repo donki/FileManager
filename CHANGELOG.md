@@ -4,6 +4,18 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## Sin publicar
+
+### Cambiado
+- Pruebas: 340 (antes 291). Cobertura de toda la app con la medida común de General §8.6 (solo
+  código ejecutable): **93,8 %** (antes 79,1 %). El banco compila ahora las páginas, el Shell, la App
+  y el arranque, y prueba los adaptadores de MAUI con dobles; `cobertura.ps1` usa el script común.
+- Por dentro, sin cambio visible: la interpretación de la lista de memorias (tarjeta SD) sale del
+  bloque de Android a `FileSystemService.BuildVolumes`; `ItemTouchBehavior` separa la emisión de los
+  gestos del enganche nativo; abrir/compartir, navegador y correo reciben sus servicios de MAUI por
+  constructor; el menú lateral toma la versión de `IAppEnvironment` y la pantalla principal repinta
+  la barra de pegar y los textos tras cambiar de idioma con su `Dispatcher` en vez de `MainThread`.
+
 ## [2026.11.24.1] — 2026-11-24
 
 ### Corregido

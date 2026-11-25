@@ -45,6 +45,6 @@ public partial class AppShell : Shell
         HomeFlyoutItem.Title = _l["Home"];
         SettingsFlyoutItem.Title = _l["Settings"];
         AboutFlyoutItem.Title = _l["About"];
-        VersionLabel.Text = $"v{AppInfo.Current.VersionString}";
+        VersionLabel.Text = $"v{ServiceHelper.GetRequiredService<IAppEnvironment>().VersionString}";
     }
 }

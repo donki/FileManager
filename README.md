@@ -48,32 +48,37 @@ git clone --recurse-submodules https://github.com/donki/FileManager.git
 
 ## 🧪 Pruebas
 
-260 pruebas automatizadas (xUnit) de la lógica de la app, sin interfaz ni dispositivo: la lógica de
-las tres pantallas (`ViewModels/`: navegación, ruta de migas, filtro, búsqueda con cancelación,
-selección múltiple, menús, renombrar, borrar, pegar con conflictos, permiso, idioma, contacto),
-operaciones de ficheros sobre carpetas temporales, validación de nombres, portapapeles, comprobación
-de versión (con un HTTP simulado), tamaños, tipos MIME, iconos, categorías, preferencias y
-traducciones (mismas claves y marcadores en castellano e inglés).
+340 pruebas automatizadas (xUnit), sin dispositivo ni emulador ni ventanas: la lógica de las tres
+pantallas (`ViewModels/`: navegación, ruta de migas, filtro, búsqueda con cancelación, selección
+múltiple, menús, renombrar, borrar, pegar con conflictos, permiso, idioma, contacto), operaciones de
+ficheros sobre carpetas temporales, memorias (interna y tarjeta SD), validación de nombres,
+portapapeles, comprobación de versión (con un HTTP simulado), tamaños, tipos MIME, iconos,
+categorías, preferencias y traducciones (mismas claves y marcadores en castellano e inglés). Desde
+2026-11-25 también **las páginas de verdad** (XAML compilado y code-behind, con un `Dispatcher` de
+prueba y los diálogos `ModernDialog` contestados por su botón), el Shell (menú y atrás), la App, el
+arranque (`MauiProgram`) y los adaptadores de MAUI (abrir, compartir, navegador, correo) con dobles.
 
 | Fecha | Pruebas | Cobertura de lo instrumentado | Cobertura sobre toda la app | Tiempo del banco |
 |---|---|---|---|---|
+| 2026-11-25 | 340 (todas pasan) | 90,5 % (incluye `Mobile/Shared`) | **93,8 %** (2296 / 2448 líneas ejecutables)† | ~7 s de pruebas, ~12 s con el arranque de `dotnet test` |
+| 2026-11-25 | 291 (todas pasan) | — | 79,1 % (1912 / 2418 líneas ejecutables)† | — |
 | 2026-10-01 | 260 (todas pasan) | 99,4 % (1706 / 1716 líneas) | 65,6 % (1706 / 2600 líneas) | ~1 s de pruebas, ~4 s con el arranque de `dotnet test` |
 | 2026-09-30 | 142 (todas pasan) | 98,9 % (874 / 883 líneas) | 36,2 % (874 / 2412 líneas)* | ~1 s de pruebas, ~6 s con el arranque de `dotnet test` |
 
 \* Con la medida antigua, que dejaba fuera los métodos `async` y las lambdas; con la corregida, 36,6 %.
+† Medida común de General §8.6 (2026-11-25): solo código ejecutable, con `Mobile/Shared/cobertura-app.py`;
+lo que el banco no compila (`Platforms/Android` y los bloques `#if ANDROID`) entra estimado y sin cubrir.
 
 ```bash
 dotnet test FileManager.Tests                      # solo las pruebas
 pwsh FileManager.Tests/cobertura.ps1               # pruebas + las dos coberturas + tiempo
+pwsh FileManager.Tests/cobertura.ps1 --detalle     # y la cifra de cada fichero
 ```
 
-Lo que queda sin probar es la capa que solo existe en el dispositivo: las páginas (el volcado del
-estado en los controles y los manejadores de una línea), `Platforms/Android` (permisos, insets,
-toasts), el arranque (`MauiProgram`, `App`, `AppShell`), los gestos nativos (`ItemTouchBehavior`) y
-los adaptadores de MAUI (`FileActionsService`, `MauiAppEnvironment`, `PageDialogService`). Las
-interfaces, los `using`, las llaves y las declaraciones también cuentan como líneas sin cubrir en la
-cifra de toda la app. El plan para llegar al 90 % (General §8.6) está en el fichero de tareas.
-
+Lo que queda sin probar es lo que solo existe en Android: `Platforms/Android` (permiso de todos los
+ficheros, márgenes de las barras del sistema, toasts), compartir con el `FileProvider` nativo, la
+lista de memorias que da `GetExternalFilesDirs` (su interpretación sí se prueba) y el enganche de los
+gestos nativos de `ItemTouchBehavior` (las pruebas emiten el toque y la pulsación larga).
 ## 🚀 Instalación
 
 ### Requisitos

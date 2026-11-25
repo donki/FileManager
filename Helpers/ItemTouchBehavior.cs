@@ -1,4 +1,6 @@
+#if ANDROID
 using AndroidView = Android.Views.View;
+#endif
 
 namespace FileManager.Helpers;
 
@@ -24,7 +26,7 @@ namespace FileManager.Helpers;
 /// propaga el <c>BindingContext</c> a los comportamientos, asi que el manejador se quedaba sin
 /// saber que elemento se habia pulsado.
 /// </remarks>
-public class ItemTouchBehavior : PlatformBehavior<View, AndroidView>
+public partial class ItemTouchBehavior
 {
     private View? _row;
 
@@ -34,9 +36,22 @@ public class ItemTouchBehavior : PlatformBehavior<View, AndroidView>
     /// <summary>Pulsacion mantenida sobre la fila.</summary>
     public event EventHandler? LongPressed;
 
+    /// <summary>La fila sobre la que esta puesto (null al quitarlo).</summary>
+    private void Attach(View? row) => _row = row;
+
+    /// <summary>Emite el toque corto con la fila como emisor.</summary>
+    internal void RaiseTapped() => Tapped?.Invoke(_row, EventArgs.Empty);
+
+    /// <summary>Emite la pulsacion larga con la fila como emisor.</summary>
+    internal void RaiseLongPressed() => LongPressed?.Invoke(_row, EventArgs.Empty);
+}
+
+#if ANDROID
+public partial class ItemTouchBehavior : PlatformBehavior<View, AndroidView>
+{
     protected override void OnAttachedTo(View bindable, AndroidView platformView)
     {
-        _row = bindable;
+        Attach(bindable);
         platformView.Clickable = true;
         platformView.LongClickable = true;
         platformView.Click += OnClick;
@@ -47,15 +62,35 @@ public class ItemTouchBehavior : PlatformBehavior<View, AndroidView>
     {
         platformView.Click -= OnClick;
         platformView.LongClick -= OnLongClick;
-        _row = null;
+        Attach(null);
     }
 
-    private void OnClick(object? sender, EventArgs e) => Tapped?.Invoke(_row, EventArgs.Empty);
+    private void OnClick(object? sender, EventArgs e) => RaiseTapped();
 
     private void OnLongClick(object? sender, AndroidView.LongClickEventArgs e)
     {
         // Consumir el evento evita que al soltar llegue tambien el toque, que abriria el elemento.
         e.Handled = true;
-        LongPressed?.Invoke(_row, EventArgs.Empty);
+        RaiseLongPressed();
     }
 }
+#else
+/// <summary>
+/// Fuera de Android (el banco de pruebas, net10.0) no hay gesto nativo: el comportamiento solo
+/// recuerda su fila, y las pruebas emiten el toque con <see cref="RaiseTapped"/>.
+/// </summary>
+public partial class ItemTouchBehavior : Behavior<View>
+{
+    protected override void OnAttachedTo(View bindable)
+    {
+        base.OnAttachedTo(bindable);
+        Attach(bindable);
+    }
+
+    protected override void OnDetachingFrom(View bindable)
+    {
+        Attach(null);
+        base.OnDetachingFrom(bindable);
+    }
+}
+#endif

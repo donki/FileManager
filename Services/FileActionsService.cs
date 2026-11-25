@@ -7,8 +7,23 @@ namespace FileManager.Services;
 public class FileActionsService : IFileActionsService
 {
     private readonly ILogger<FileActionsService> _logger;
+    private readonly ILauncher _launcher;
+    private readonly IShare _share;
+    private readonly Func<string> _cacheDirectory;
 
-    public FileActionsService(ILogger<FileActionsService> logger) => _logger = logger;
+    public FileActionsService(ILogger<FileActionsService> logger)
+        : this(logger, Launcher.Default, Share.Default, () => FileSystem.CacheDirectory)
+    {
+    }
+
+    /// <summary>Con el lanzador, el compartir y la cache que se le den (pruebas).</summary>
+    internal FileActionsService(ILogger<FileActionsService> logger, ILauncher launcher, IShare share, Func<string> cacheDirectory)
+    {
+        _logger = logger;
+        _launcher = launcher;
+        _share = share;
+        _cacheDirectory = cacheDirectory;
+    }
 
     public async Task<bool> OpenAsync(string path)
     {
@@ -19,7 +34,7 @@ public class FileActionsService : IFileActionsService
 
         try
         {
-            await Launcher.Default.OpenAsync(request);
+            await _launcher.OpenAsync(request);
             return true;
         }
         catch (Exception ex)
@@ -34,7 +49,7 @@ public class FileActionsService : IFileActionsService
     public async Task ShareAsync(IReadOnlyList<string> paths, string title)
     {
         // Las carpetas se comprimen fuera del hilo de la interfaz: pueden tardar.
-        var workDir = Path.Combine(FileSystem.CacheDirectory, "share");
+        var workDir = Path.Combine(_cacheDirectory(), "share");
         var files = await Task.Run(() => SharePreparer.Prepare(paths, workDir));
         var mime = MimeTypes.Common(files);
 
@@ -47,7 +62,7 @@ public class FileActionsService : IFileActionsService
         // fichero a su cache y lo comparte desde alli.
         if (files.Count == 1)
         {
-            await Share.Default.RequestAsync(new ShareFileRequest
+            await _share.RequestAsync(new ShareFileRequest
             {
                 Title = title,
                 File = new ShareFile(files[0], MimeTypes.ForPath(files[0]))
@@ -55,7 +70,7 @@ public class FileActionsService : IFileActionsService
         }
         else
         {
-            await Share.Default.RequestAsync(new ShareMultipleFilesRequest
+            await _share.RequestAsync(new ShareMultipleFilesRequest
             {
                 Title = title,
                 Files = files.Select(f => new ShareFile(f, MimeTypes.ForPath(f))).ToList()

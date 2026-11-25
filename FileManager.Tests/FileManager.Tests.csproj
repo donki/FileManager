@@ -12,6 +12,14 @@
     <IsTestProject>true</IsTestProject>
     <RootNamespace>FileManager.Tests</RootNamespace>
     <RunSettingsFilePath>$(MSBuildThisFileDirectory)coverlet.runsettings</RunSettingsFilePath>
+    <!-- La cuna de Preferences (Stubs/) tapa a la de MAUI a proposito. -->
+    <NoWarn>$(NoWarn);CS0436</NoWarn>
+    <!-- Con MAUI se compilan tambien los XAML de las paginas, el Shell y la App: las pruebas crean
+         las paginas de verdad (sin plataforma debajo) y pulsan sus controles. -->
+    <UseMaui>true</UseMaui>
+    <SingleProject>false</SingleProject>
+    <OutputType>Library</OutputType>
+    <EnableDefaultMauiItems>false</EnableDefaultMauiItems>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,35 +35,34 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
     <Using Include="Microsoft.Maui.Storage" />
+    <Using Include="Microsoft.Maui.Graphics" />
+    <Using Include="Microsoft.Maui.Controls" />
+    <Using Include="Microsoft.Maui" />
   </ItemGroup>
 
-  <!-- Codigo de la app que se prueba (enlazado, no copiado). -->
+  <!-- Codigo de la app que se prueba (enlazado, no copiado): todo lo que no es de Platforms/. -->
   <ItemGroup>
     <Compile Include="..\Models\*.cs" Link="App\Models\%(Filename)%(Extension)" />
-    <Compile Include="..\Helpers\FileIcons.cs" Link="App\Helpers\FileIcons.cs" />
-    <Compile Include="..\Helpers\MimeTypes.cs" Link="App\Helpers\MimeTypes.cs" />
-    <Compile Include="..\Helpers\SizeFormatter.cs" Link="App\Helpers\SizeFormatter.cs" />
-    <Compile Include="..\Helpers\SharePreparer.cs" Link="App\Helpers\SharePreparer.cs" />
-    <Compile Include="..\Services\IFileSystemService.cs" Link="App\Services\IFileSystemService.cs" />
-    <Compile Include="..\Services\FileSystemService.cs" Link="App\Services\FileSystemService.cs" />
-    <Compile Include="..\Services\IFileClipboardService.cs" Link="App\Services\IFileClipboardService.cs" />
-    <Compile Include="..\Services\FileClipboardService.cs" Link="App\Services\FileClipboardService.cs" />
-    <Compile Include="..\Services\ISettingsService.cs" Link="App\Services\ISettingsService.cs" />
-    <Compile Include="..\Services\SettingsService.cs" Link="App\Services\SettingsService.cs" />
-    <Compile Include="..\Services\ILocalizationService.cs" Link="App\Services\ILocalizationService.cs" />
-    <Compile Include="..\Services\LocalizationService.cs" Link="App\Services\LocalizationService.cs" />
-    <Compile Include="..\Services\IFileActionsService.cs" Link="App\Services\IFileActionsService.cs" />
-    <Compile Include="..\Services\IStoragePermissionService.cs" Link="App\Services\IStoragePermissionService.cs" />
-    <Compile Include="..\Services\IToastService.cs" Link="App\Services\IToastService.cs" />
-    <Compile Include="..\Services\IDialogService.cs" Link="App\Services\IDialogService.cs" />
-    <Compile Include="..\Services\IAppEnvironment.cs" Link="App\Services\IAppEnvironment.cs" />
-    <Compile Include="..\Services\UpdateService.cs" Link="App\Services\UpdateService.cs" />
+    <Compile Include="..\Helpers\*.cs" Link="App\Helpers\%(Filename)%(Extension)" />
+    <Compile Include="..\Services\*.cs" Link="App\Services\%(Filename)%(Extension)" />
     <Compile Include="..\ViewModels\*.cs" Link="App\ViewModels\%(Filename)%(Extension)" />
+    <Compile Include="..\Pages\*.xaml.cs" Link="App\Pages\%(Filename)%(Extension)" DependentUpon="%(Filename)" />
+    <MauiXaml Include="..\Pages\*.xaml" Link="App\Pages\%(Filename)%(Extension)" />
+    <Compile Include="..\App.xaml.cs" Link="App\App.xaml.cs" />
+    <MauiXaml Include="..\App.xaml" Link="App.xaml" />
+    <Compile Include="..\AppShell.xaml.cs" Link="App\AppShell.xaml.cs" />
+    <MauiXaml Include="..\AppShell.xaml" Link="App\AppShell.xaml" />
+    <Compile Include="..\MauiProgram.cs" Link="App\MauiProgram.cs" />
+    <MauiXaml Include="..\Resources\Styles\*.xaml" Link="Resources\Styles\%(Filename)%(Extension)" />
+    <Compile Include="..\..\Shared\ModernDialog.cs" Link="Shared\ModernDialog.cs" />
+    <Compile Include="..\..\Shared\CrashGuard.cs" Link="Shared\CrashGuard.cs" />
+    <Compile Include="..\..\Shared\AuthorNotes.cs" Link="Shared\AuthorNotes.cs" />
   </ItemGroup>
-
 </Project>

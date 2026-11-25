@@ -29,25 +29,34 @@ public class FileSystemService : IFileSystemService
 
     public IReadOnlyList<StorageVolume> GetVolumes()
     {
-        var internalRoot = RootPath;
-        var volumes = new List<StorageVolume> { new(internalRoot, IsRemovable: false) };
-
+        Func<IEnumerable<string?>> appDirs = Array.Empty<string?>;
 #if ANDROID
+        appDirs = () => (Android.App.Application.Context.GetExternalFilesDirs(null) ?? Array.Empty<Java.IO.File>())
+            .Select(d => d?.AbsolutePath);
+#endif
+        return BuildVolumes(RootPath, appDirs, Directory.Exists);
+    }
+
+    /// <summary>
+    /// Memorias del dispositivo a partir de la carpeta privada de la app en cada una (lo que da
+    /// <c>GetExternalFilesDirs</c>: <c>.../Android/data/&lt;paquete&gt;/files</c>): la raiz de cada
+    /// memoria es lo que va antes de <c>/Android/</c>. La interna va siempre primera; se saltan las
+    /// carpetas nulas o sin <c>/Android/</c>, las repetidas y las que no existen. Funciona desde la
+    /// API 19 y no necesita reflexion sobre StorageVolume.
+    /// </summary>
+    internal IReadOnlyList<StorageVolume> BuildVolumes(string internalRoot, Func<IEnumerable<string?>> appDirs, Func<string, bool> exists)
+    {
+        var volumes = new List<StorageVolume> { new(internalRoot, IsRemovable: false) };
         try
         {
-            // GetExternalFilesDirs devuelve la carpeta privada de la app en cada memoria montada
-            // (.../Android/data/<paquete>/files); la raiz de la memoria es lo que va antes de
-            // /Android/. Funciona desde la API 19 y no necesita reflexion sobre StorageVolume.
-            var dirs = Android.App.Application.Context.GetExternalFilesDirs(null) ?? Array.Empty<Java.IO.File>();
-            foreach (var dir in dirs)
+            foreach (var path in appDirs())
             {
-                var path = dir?.AbsolutePath;
                 var cut = path?.IndexOf("/Android/", StringComparison.Ordinal) ?? -1;
                 if (path is null || cut <= 0)
                     continue;
 
                 var root = path[..cut];
-                if (volumes.Any(v => string.Equals(v.RootPath, root, StringComparison.OrdinalIgnoreCase)) || !Directory.Exists(root))
+                if (volumes.Any(v => string.Equals(v.RootPath, root, StringComparison.OrdinalIgnoreCase)) || !exists(root))
                     continue;
 
                 volumes.Add(new StorageVolume(root, IsRemovable: true));
@@ -58,8 +67,6 @@ public class FileSystemService : IFileSystemService
             // Sin la lista de memorias se sigue con la interna, que es lo que habia antes.
             _logger.LogWarning(ex, "Could not list the storage volumes");
         }
-#endif
-
         return volumes;
     }
 
