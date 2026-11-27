@@ -85,6 +85,8 @@ public sealed class ShellAndStartupTests : PageHost
             Assert.IsType<FileActionsService>(app.Services.GetService<IFileActionsService>());
             Assert.NotNull(app.Services.GetService<UpdateService>());
             Assert.IsType<MauiAppEnvironment>(app.Services.GetService<IAppEnvironment>());
+            // Fuera de Android (el banco) no hay quien haga miniaturas: todo con icono.
+            Assert.IsType<NoThumbnailGenerator>(app.Services.GetService<IThumbnailGenerator>());
             // ServiceHelper queda apuntando al contenedor de la app.
             Assert.Same(app.Services.GetService<ISettingsService>(), ServiceHelper.GetRequiredService<ISettingsService>());
         }

@@ -19,6 +19,7 @@ public sealed class SettingsPageTests : PageHost
     {
         Settings.ShowHiddenFiles = true;
         Settings.ConfirmDelete = false;
+        Settings.ShowThumbnails = false;
 
         var page = Appeared();
 
@@ -31,6 +32,7 @@ public sealed class SettingsPageTests : PageHost
         }
         Assert.True(Named<Switch>(page, "ShowHiddenSwitch").IsToggled);
         Assert.False(Named<Switch>(page, "ConfirmDeleteSwitch").IsToggled);
+        Assert.False(Named<Switch>(page, "ShowThumbnailsSwitch").IsToggled);
         Assert.Equal(L("SettingsPermissionOk"), Named<Label>(page, "PermissionStateValue").Text);
         Assert.Equal((Color)Application.Current!.Resources["Success"], Named<Label>(page, "PermissionStateValue").TextColor);
         // Idioma activo (ingles) con el estilo primario.
@@ -76,9 +78,11 @@ public sealed class SettingsPageTests : PageHost
 
         Named<Switch>(page, "ShowHiddenSwitch").IsToggled = true;
         Named<Switch>(page, "ConfirmDeleteSwitch").IsToggled = false;
+        Named<Switch>(page, "ShowThumbnailsSwitch").IsToggled = false;
 
         Assert.True(Settings.ShowHiddenFiles);
         Assert.False(Settings.ConfirmDelete);
+        Assert.False(Settings.ShowThumbnails);
     }
 
     [Fact]

@@ -196,21 +196,44 @@
                                                     <helpers:ItemTouchBehavior Tapped="OnRecentTapped"
                                                                                LongPressed="OnRecentLongPressed" />
                                                 </VerticalStackLayout.Behaviors>
-                                                <Border WidthRequest="44"
-                                                        HeightRequest="44"
-                                                        StrokeThickness="0"
-                                                        HorizontalOptions="Start"
-                                                        BackgroundColor="{AppThemeBinding Light={StaticResource IconTileLight}, Dark={StaticResource IconTileDark}}">
-                                                    <Border.StrokeShape>
-                                                        <RoundRectangle CornerRadius="22" />
-                                                    </Border.StrokeShape>
-                                                    <Image Source="{Binding Icon}"
-                                                           WidthRequest="24"
-                                                           HeightRequest="24"
-                                                           Aspect="AspectFit"
-                                                           HorizontalOptions="Center"
-                                                           VerticalOptions="Center" />
-                                                </Border>
+                                                <Grid WidthRequest="44" HeightRequest="44" HorizontalOptions="Start">
+                                                    <Border StrokeThickness="0"
+                                                            IsVisible="{Binding ShowIcon}"
+                                                            BackgroundColor="{AppThemeBinding Light={StaticResource IconTileLight}, Dark={StaticResource IconTileDark}}">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="22" />
+                                                        </Border.StrokeShape>
+                                                        <Image Source="{Binding Icon}"
+                                                               WidthRequest="24"
+                                                               HeightRequest="24"
+                                                               Aspect="AspectFit"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center" />
+                                                    </Border>
+                                                    <!-- Miniatura de foto o video: cuadrado redondeado que llena la pastilla. -->
+                                                    <Border StrokeThickness="0"
+                                                            IsVisible="{Binding HasThumbnail}"
+                                                            BindingContextChanged="OnThumbnailBound"
+                                                            BackgroundColor="{AppThemeBinding Light={StaticResource IconTileLight}, Dark={StaticResource IconTileDark}}">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="12" />
+                                                        </Border.StrokeShape>
+                                                        <Image Source="{Binding Thumbnail}" Aspect="AspectFill" />
+                                                    </Border>
+                                                    <Border WidthRequest="18"
+                                                            HeightRequest="18"
+                                                            Margin="0,0,2,2"
+                                                            StrokeThickness="0"
+                                                            HorizontalOptions="End"
+                                                            VerticalOptions="End"
+                                                            IsVisible="{Binding ShowVideoBadge}"
+                                                            BackgroundColor="#99000000">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="9" />
+                                                        </Border.StrokeShape>
+                                                        <Image Source="ic_play_w.png" WidthRequest="12" HeightRequest="12" />
+                                                    </Border>
+                                                </Grid>
                                                 <Label Text="{Binding Name}"
                                                        FontSize="13"
                                                        LineBreakMode="TailTruncation"
@@ -250,6 +273,7 @@
                                             HeightRequest="44"
                                             StrokeThickness="0"
                                             VerticalOptions="Center"
+                                            IsVisible="{Binding ShowIcon}"
                                             BackgroundColor="{AppThemeBinding Light={StaticResource IconTileLight}, Dark={StaticResource IconTileDark}}">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="22" />
@@ -260,6 +284,36 @@
                                                Aspect="AspectFit"
                                                HorizontalOptions="Center"
                                                VerticalOptions="Center" />
+                                    </Border>
+
+                                    <!-- Miniatura de foto o video (cuadrado redondeado que llena la pastilla). Se pide
+                                         al enlazar la fila con su elemento y se suelta al reciclarla para otro. -->
+                                    <Border Grid.Column="0"
+                                            WidthRequest="44"
+                                            HeightRequest="44"
+                                            StrokeThickness="0"
+                                            VerticalOptions="Center"
+                                            IsVisible="{Binding HasThumbnail}"
+                                            BindingContextChanged="OnThumbnailBound"
+                                            BackgroundColor="{AppThemeBinding Light={StaticResource IconTileLight}, Dark={StaticResource IconTileDark}}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12" />
+                                        </Border.StrokeShape>
+                                        <Image Source="{Binding Thumbnail}" Aspect="AspectFill" />
+                                    </Border>
+                                    <Border Grid.Column="0"
+                                            WidthRequest="18"
+                                            HeightRequest="18"
+                                            Margin="0,0,2,4"
+                                            StrokeThickness="0"
+                                            HorizontalOptions="End"
+                                            VerticalOptions="End"
+                                            IsVisible="{Binding ShowVideoBadge}"
+                                            BackgroundColor="#99000000">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="9" />
+                                        </Border.StrokeShape>
+                                        <Image Source="ic_play_w.png" WidthRequest="12" HeightRequest="12" />
                                     </Border>
 
                                     <!-- Casilla de selección múltiple: círculo con ✓ sobre el icono. -->

@@ -31,6 +31,9 @@ public abstract class PageHost : IDisposable
     protected readonly FakeToast Toast = new();
     protected readonly FakeEnvironment Environment = new();
     protected readonly TestDispatcher Dispatcher = new();
+    protected readonly TempFolder ThumbCache = new();
+    protected readonly FakeThumbnailGenerator ThumbGen = new();
+    protected readonly ThumbnailService Thumbs;
     protected readonly ServiceProvider Services;
 
     protected PageHost()
@@ -38,6 +41,7 @@ public abstract class PageHost : IDisposable
         Preferences.Clear();
         Files = new RootedFileSystem(Tmp.Path);
         Loc = new LocalizationService(Settings, NullLogger<LocalizationService>.Instance);
+        Thumbs = new ThumbnailService(Settings, ThumbGen, ThumbCache.Path, NullLogger<ThumbnailService>.Instance);
         Services = new ServiceCollection()
             .AddSingleton<ISettingsService>(Settings)
             .AddSingleton<ILocalizationService>(Loc)
@@ -49,6 +53,7 @@ public abstract class PageHost : IDisposable
             .AddSingleton<IAppEnvironment>(Environment)
             // Sin red: la comprobacion de version recibe siempre «estas al dia».
             .AddSingleton(new UpdateService(Loc, Environment, new HttpClient(StubHttpHandler.Json("{\"version\":\"2000.1.1.0\"}"))))
+            .AddSingleton(Thumbs)
             .AddSingleton<Pages.MainPage>()
             .AddTransient<Pages.SettingsPage>()
             .AddTransient<Pages.AboutPage>()
@@ -160,6 +165,7 @@ public abstract class PageHost : IDisposable
         Application.Current = null;
         Services.Dispose();
         Tmp.Dispose();
+        ThumbCache.Dispose();
         CultureInfo.DefaultThreadCurrentCulture = _culture;
         CultureInfo.DefaultThreadCurrentUICulture = _uiCulture;
         GC.SuppressFinalize(this);

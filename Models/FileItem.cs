@@ -48,6 +48,40 @@ public class FileItem : INotifyPropertyChanged
     /// <summary>Nombre del recurso de icono (PNG vectorial) mostrado en la lista, asignado segun el tipo de contenido.</summary>
     public string Icon { get; set; } = "ic_file_generic.png";
 
+    private string? _thumbnailPath;
+
+    /// <summary>
+    /// Fichero de la miniatura en la cache (fotos y videos), o null mientras no este hecha o si no
+    /// lleva: entonces se ensena <see cref="Icon"/>. Observable: llega en segundo plano.
+    /// </summary>
+    public string? ThumbnailPath
+    {
+        get => _thumbnailPath;
+        set
+        {
+            if (_thumbnailPath == value)
+                return;
+            _thumbnailPath = value;
+            Thumbnail = value is null ? null : ImageSource.FromFile(value);
+            OnChanged();
+            OnChanged(nameof(Thumbnail));
+            OnChanged(nameof(HasThumbnail));
+            OnChanged(nameof(ShowIcon));
+            OnChanged(nameof(ShowVideoBadge));
+        }
+    }
+
+    /// <summary>La miniatura lista para la vista (se crea una vez, al llegar la ruta).</summary>
+    public ImageSource? Thumbnail { get; private set; }
+
+    public bool HasThumbnail => _thumbnailPath is not null;
+
+    /// <summary>Sin miniatura se ensena el icono del tipo.</summary>
+    public bool ShowIcon => _thumbnailPath is null;
+
+    /// <summary>Sobre la miniatura de un video va la marca de reproducir, para no confundirlo con una foto.</summary>
+    public bool ShowVideoBadge => _thumbnailPath is not null && Category == FileCategory.Video;
+
     /// <summary>Linea secundaria de la fila (fecha y tamano ya formateados y localizados).</summary>
     public string Details { get; set; } = string.Empty;
 

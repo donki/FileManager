@@ -20,6 +20,8 @@ public class SettingsViewModel
         ["ShowHiddenHint"] = "SettingsShowHiddenHint",
         ["ConfirmDeleteLabel"] = "SettingsConfirmDelete",
         ["ConfirmDeleteHint"] = "SettingsConfirmDeleteHint",
+        ["ShowThumbnailsLabel"] = "SettingsShowThumbnails",
+        ["ShowThumbnailsHint"] = "SettingsShowThumbnailsHint",
         ["StorageTitle"] = "SettingsStorage",
         ["PermissionStateLabel"] = "SettingsPermissionState",
         ["PermissionButton"] = "PermissionOpenSettings",
@@ -50,6 +52,8 @@ public class SettingsViewModel
 
     public bool ConfirmDelete => _settings.ConfirmDelete;
 
+    public bool ShowThumbnails => _settings.ShowThumbnails;
+
     public bool PermissionGranted => _permissions.HasFullAccess;
 
     public string PermissionStateText => PermissionGranted ? _l["SettingsPermissionOk"] : _l["SettingsPermissionKo"];
@@ -75,6 +79,12 @@ public class SettingsViewModel
     {
         if (!Loading)
             _settings.ConfirmDelete = value;
+    }
+
+    public void SetShowThumbnails(bool value)
+    {
+        if (!Loading)
+            _settings.ShowThumbnails = value;
     }
 
     public async Task RequestPermissionAsync(IDialogService dialogs)

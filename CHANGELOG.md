@@ -4,9 +4,30 @@ Todos los cambios relevantes de este proyecto se registran en este fichero (cons
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## Sin publicar
+## [2026.11.27.0] — 2026-11-27
+
+### Añadido
+- **Miniaturas de fotos y vídeos**: en la lista y en la franja de «Últimos ficheros», las fotos
+  (jpg, png, webp, heic, gif, bmp) y los vídeos (mp4, mkv, webm, 3gp, mov, avi…) enseñan una
+  miniatura en vez del icono genérico, en un cuadrado redondeado; los vídeos llevan encima una marca
+  de reproducir. Mientras se hace, o si el formato no se puede leer, se ve el icono de siempre. Vale
+  también en la tarjeta SD.
+- Interruptor **«Mostrar miniaturas»** en Configuración › Visualización (activado por defecto).
+- Por dentro: las miniaturas (128 px) se hacen fuera del hilo de la interfaz, de dos en dos y la más
+  reciente primero; se piden cuando una fila aparece y se sueltan cuando se recicla al desplazar, con
+  un tope de pendientes. Se guardan en la caché de la app (clave: ruta, tamaño, fecha de modificación
+  y lado; tope de 2000 ficheros) y en memoria solo se recuerda la ruta de cada una (tope de 512).
+  Android 10 y siguientes usan `ThumbnailUtils` con tamaño y cancelación; Android 7 a 9,
+  `BitmapFactory` reducido con `inSampleSize` y girado según el EXIF.
+- Pruebas: 401 (antes 340): qué ficheros llevan miniatura, clave de caché, reducción y giro, caché en
+  memoria y en disco, cola con tope y cancelación, fallos (se queda el icono), interruptor, y las
+  pantallas (lista, recientes y Configuración).
 
 ### Cambiado
+- **Cobertura sobre toda la app: 91,9 %** (antes 93,8 %). Baja porque el generador de miniaturas de
+  Android (`Platforms/Android/ThumbnailGenerator.cs`, ~70 líneas estimadas) no se puede ejecutar en el
+  banco; todo lo nuevo que no es de Android está al 100 % (cálculos de reducción y giro sacados a
+  `Helpers/Thumbnails.cs` para poder probarlos). Sigue por encima del mínimo del 90 % (General §8.6).
 - Pruebas: 340 (antes 291). Cobertura de toda la app con la medida común de General §8.6 (solo
   código ejecutable): **93,8 %** (antes 79,1 %). El banco compila ahora las páginas, el Shell, la App
   y el arranque, y prueba los adaptadores de MAUI con dobles; `cobertura.ps1` usa el script común.

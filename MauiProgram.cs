@@ -37,9 +37,17 @@ public static class MauiProgram
         // App.CreateWindow resuelve MainPage, que pide UpdateService por constructor.
         builder.Services.AddSingleton<IAppEnvironment, MauiAppEnvironment>();
         builder.Services.AddSingleton<UpdateService>();
+        builder.Services.AddSingleton(sp => new ThumbnailService(
+            sp.GetRequiredService<ISettingsService>(),
+            sp.GetRequiredService<IThumbnailGenerator>(),
+            Path.Combine(FileSystem.CacheDirectory, "thumbnails"),
+            sp.GetRequiredService<ILogger<ThumbnailService>>()));
 #if ANDROID
+        builder.Services.AddSingleton<IThumbnailGenerator, Platforms.Android.ThumbnailGenerator>();
         builder.Services.AddSingleton<IStoragePermissionService, Platforms.Android.StoragePermissionService>();
         builder.Services.AddSingleton<IToastService, Platforms.Android.ToastService>();
+#else
+        builder.Services.AddSingleton<IThumbnailGenerator, NoThumbnailGenerator>();
 #endif
 
         // Paginas (carpeta Pages): enlace fino con su logica en ViewModels (ver README, Arquitectura).

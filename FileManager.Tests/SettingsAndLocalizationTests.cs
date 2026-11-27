@@ -21,6 +21,7 @@ public sealed class SettingsServiceTests : IDisposable
         Assert.Equal(LocalizationService.SystemLanguage, _settings.Language);
         Assert.False(_settings.ShowHiddenFiles);
         Assert.True(_settings.ConfirmDelete);
+        Assert.True(_settings.ShowThumbnails);
         Assert.Equal(SortMode.NameAscending, _settings.Sort);
     }
 
@@ -30,12 +31,14 @@ public sealed class SettingsServiceTests : IDisposable
         _settings.Language = "es";
         _settings.ShowHiddenFiles = true;
         _settings.ConfirmDelete = false;
+        _settings.ShowThumbnails = false;
         _settings.Sort = SortMode.SizeDescending;
 
         var reloaded = new SettingsService(NullLogger<SettingsService>.Instance);
         Assert.Equal("es", reloaded.Language);
         Assert.True(reloaded.ShowHiddenFiles);
         Assert.False(reloaded.ConfirmDelete);
+        Assert.False(reloaded.ShowThumbnails);
         Assert.Equal(SortMode.SizeDescending, reloaded.Sort);
     }
 
@@ -76,6 +79,7 @@ public sealed class LocalizationServiceTests : IDisposable
         public string Language { get; set; } = "";
         public bool ShowHiddenFiles { get; set; }
         public bool ConfirmDelete { get; set; }
+        public bool ShowThumbnails { get; set; }
         public SortMode Sort { get; set; }
     }
 

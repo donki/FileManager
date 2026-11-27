@@ -16,6 +16,7 @@ public partial class MainPage : ContentPage, IMainView
     private readonly IDialogService _dialogs;
     private readonly UpdateService _update;
     private readonly MainViewModel _vm;
+    private readonly ThumbnailService _thumbnails;
     private IReadOnlyList<Crumb>? _drawnBreadcrumb;
 
     public MainPage(
@@ -27,6 +28,7 @@ public partial class MainPage : ContentPage, IMainView
         IStoragePermissionService permissions,
         IToastService toast,
         UpdateService update,
+        ThumbnailService thumbnails,
         ILogger<MainPage> logger)
     {
         InitializeComponent();
@@ -34,6 +36,9 @@ public partial class MainPage : ContentPage, IMainView
         _l = localization;
         _update = update;
         _dialogs = new PageDialogService(this);
+        _thumbnails = thumbnails;
+        // Las miniaturas se hacen en segundo plano y se ponen en la fila desde el hilo de la interfaz.
+        _thumbnails.Post = action => Dispatcher.Dispatch(action);
         _vm = new MainViewModel(files, clipboard, actions, settings, localization, permissions, toast, _dialogs, this, logger);
 
         FilesView.ItemsSource = _vm.Items;
@@ -190,6 +195,14 @@ public partial class MainPage : ContentPage, IMainView
     {
         if (ItemOf(sender) is { } item)
             await _vm.ItemTappedAsync(item);
+    }
+
+    // Una fila (o tarjeta de recientes) pasa a ensenar otro elemento: se pide su miniatura y se
+    // suelta la del anterior, que ya no se ve.
+    private void OnThumbnailBound(object? sender, EventArgs e)
+    {
+        if (sender is BindableObject view)
+            _thumbnails.Bind(view, view.BindingContext as FileItem);
     }
 
     private async void OnRecentTapped(object? sender, EventArgs e)

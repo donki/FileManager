@@ -22,6 +22,7 @@ git clone --recurse-submodules https://github.com/donki/FileManager.git
 - Navegación por carpetas con **ruta de navegación** (breadcrumb) pulsable
 - **Botón atrás** de Android sube una carpeta en lugar de cerrar la aplicación
 - Iconos por tipo de contenido (imagen, vídeo, audio, documento, comprimido, APK…)
+- **Miniaturas** de fotos y vídeos en la lista y en «Últimos ficheros» (se pueden apagar en Configuración)
 - Fecha, tamaño y número de elementos de cada entrada
 - Mostrar u ocultar ficheros ocultos
 
@@ -48,11 +49,12 @@ git clone --recurse-submodules https://github.com/donki/FileManager.git
 
 ## 🧪 Pruebas
 
-340 pruebas automatizadas (xUnit), sin dispositivo ni emulador ni ventanas: la lógica de las tres
+401 pruebas automatizadas (xUnit), sin dispositivo ni emulador ni ventanas: la lógica de las tres
 pantallas (`ViewModels/`: navegación, ruta de migas, filtro, búsqueda con cancelación, selección
 múltiple, menús, renombrar, borrar, pegar con conflictos, permiso, idioma, contacto), operaciones de
 ficheros sobre carpetas temporales, memorias (interna y tarjeta SD), validación de nombres,
 portapapeles, comprobación de versión (con un HTTP simulado), tamaños, tipos MIME, iconos,
+miniaturas (qué ficheros, clave de caché, cola con cancelación, cachés en memoria y disco, fallos),
 categorías, preferencias y traducciones (mismas claves y marcadores en castellano e inglés). Desde
 2026-11-25 también **las páginas de verdad** (XAML compilado y code-behind, con un `Dispatcher` de
 prueba y los diálogos `ModernDialog` contestados por su botón), el Shell (menú y atrás), la App, el
@@ -60,6 +62,7 @@ arranque (`MauiProgram`) y los adaptadores de MAUI (abrir, compartir, navegador,
 
 | Fecha | Pruebas | Cobertura de lo instrumentado | Cobertura sobre toda la app | Tiempo del banco |
 |---|---|---|---|---|
+| 2026-11-27 | 401 (todas pasan) | 91,3 % (incluye `Mobile/Shared`) | **91,9 %** (2560 / 2785 líneas ejecutables)† | ~7 s de pruebas, ~12 s con el arranque de `dotnet test` |
 | 2026-11-25 | 340 (todas pasan) | 90,5 % (incluye `Mobile/Shared`) | **93,8 %** (2296 / 2448 líneas ejecutables)† | ~7 s de pruebas, ~12 s con el arranque de `dotnet test` |
 | 2026-11-25 | 291 (todas pasan) | — | 79,1 % (1912 / 2418 líneas ejecutables)† | — |
 | 2026-10-01 | 260 (todas pasan) | 99,4 % (1706 / 1716 líneas) | 65,6 % (1706 / 2600 líneas) | ~1 s de pruebas, ~4 s con el arranque de `dotnet test` |
@@ -76,7 +79,8 @@ pwsh FileManager.Tests/cobertura.ps1 --detalle     # y la cifra de cada fichero
 ```
 
 Lo que queda sin probar es lo que solo existe en Android: `Platforms/Android` (permiso de todos los
-ficheros, márgenes de las barras del sistema, toasts), compartir con el `FileProvider` nativo, la
+ficheros, márgenes de las barras del sistema, toasts, el generador de miniaturas con `ThumbnailUtils`
+y `BitmapFactory`), compartir con el `FileProvider` nativo, la
 lista de memorias que da `GetExternalFilesDirs` (su interpretación sí se prueba) y el enganche de los
 gestos nativos de `ItemTouchBehavior` (las pruebas emiten el toque y la pulsación larga).
 ## 🚀 Instalación

@@ -337,6 +337,64 @@ public sealed class MainPageTests : PageHost
     }
 
     [Fact]
+    public async Task Las_fotos_de_la_lista_cambian_el_icono_por_su_miniatura_al_enlazar_la_fila()
+    {
+        Tmp.File("Fotos/playa.jpg");
+        Tmp.File("Fotos/clip.mp4");
+        Tmp.File("Fotos/nota.txt");
+        var page = NewPage();
+        await AppearAsync(page);
+        await Vm(page).LoadAsync(Tmp.Combine("Fotos"));
+
+        var photo = Item(page, "playa.jpg");
+        var video = Item(page, "clip.mp4");
+        var note = Item(page, "nota.txt");
+        var photoRow = Row(page, photo);
+        var videoRow = Row(page, video);
+        Row(page, note);
+
+        await Until(() => photo.HasThumbnail && video.HasThumbnail, "las miniaturas de la lista");
+        // Llegan por el hilo de la interfaz: el servicio entrega por el Dispatcher de la pagina.
+        var dispatcher = Assert.IsType<TestDispatcher>(page.Dispatcher);
+        var before = dispatcher.Dispatched;
+        var ran = false;
+        Thumbs.Post(() => ran = true);
+        Assert.True(ran);
+        Assert.Equal(before + 1, dispatcher.Dispatched);
+        Assert.True(note.ShowIcon);
+        Assert.Equal(new[] { false, true, false }, VisibleBorders(photoRow));
+        Assert.Equal(new[] { false, true, true }, VisibleBorders(videoRow));
+
+        // La fila se recicla para la nota: suelta la foto y la nota sigue con su icono.
+        photoRow.BindingContext = note;
+        await Settle();
+        Assert.True(note.ShowIcon);
+    }
+
+    /// <summary>Visibilidad de icono, miniatura y marca de video (las pastillas con imagen; la casilla de seleccion lleva texto).</summary>
+    private static bool[] VisibleBorders(View view) =>
+        view.GetVisualTreeDescendants().OfType<Border>().Where(b => b.Content is Image).Select(b => b.IsVisible).ToArray();
+
+    [Fact]
+    public async Task Los_recientes_tambien_llevan_miniatura_y_con_el_interruptor_apagado_no()
+    {
+        Tmp.File("Fotos/playa.jpg");
+        var page = NewPage();
+        await AppearAsync(page);
+
+        var card = (View)Named<HorizontalStackLayout>(page, "RecentBar").Children.Single();
+        var recent = (FileItem)card.BindingContext;
+        await Until(() => recent.HasThumbnail, "la miniatura del reciente");
+        Assert.Equal(new[] { false, true, false }, VisibleBorders(card));
+
+        Settings.ShowThumbnails = false;
+        var other = new FileItem { Name = "otra.jpg", FullPath = Tmp.File("otra.jpg"), Modified = DateTime.Now };
+        Row(page, other);
+        await Settle();
+        Assert.True(other.ShowIcon);
+    }
+
+    [Fact]
     public async Task Toques_sin_elemento_no_hacen_nada()
     {
         var page = NewPage();

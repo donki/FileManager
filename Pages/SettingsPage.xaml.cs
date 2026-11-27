@@ -43,6 +43,7 @@ public partial class SettingsPage : ContentPage
             EnglishButton.Style = LookupStyle(_vm.IsSpanish ? "OutlineButton" : "PrimaryButton");
             ShowHiddenSwitch.IsToggled = _vm.ShowHiddenFiles;
             ConfirmDeleteSwitch.IsToggled = _vm.ConfirmDelete;
+            ShowThumbnailsSwitch.IsToggled = _vm.ShowThumbnails;
             PermissionStateValue.Text = _vm.PermissionStateText;
             PermissionStateValue.TextColor = (Color)Application.Current!.Resources[_vm.PermissionGranted ? "Success" : "Danger"];
         }
@@ -69,6 +70,8 @@ public partial class SettingsPage : ContentPage
     private void OnShowHiddenToggled(object? sender, ToggledEventArgs e) => _vm.SetShowHiddenFiles(e.Value);
 
     private void OnConfirmDeleteToggled(object? sender, ToggledEventArgs e) => _vm.SetConfirmDelete(e.Value);
+
+    private void OnShowThumbnailsToggled(object? sender, ToggledEventArgs e) => _vm.SetShowThumbnails(e.Value);
 
     private async void OnPermissionClicked(object? sender, EventArgs e) => await _vm.RequestPermissionAsync(_dialogs);
 

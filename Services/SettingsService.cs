@@ -10,6 +10,7 @@ public class SettingsService : ISettingsService
     private const string ShowHiddenKey = "show_hidden";
     private const string ConfirmDeleteKey = "confirm_delete";
     private const string SortKey = "sort_mode";
+    private const string ShowThumbnailsKey = "show_thumbnails";
 
     private readonly ILogger<SettingsService> _logger;
 
@@ -31,6 +32,12 @@ public class SettingsService : ISettingsService
     {
         get => Preferences.Get(ConfirmDeleteKey, true);
         set => Preferences.Set(ConfirmDeleteKey, value);
+    }
+
+    public bool ShowThumbnails
+    {
+        get => Preferences.Get(ShowThumbnailsKey, true);
+        set => Preferences.Set(ShowThumbnailsKey, value);
     }
 
     public SortMode Sort

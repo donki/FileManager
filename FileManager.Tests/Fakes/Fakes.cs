@@ -12,6 +12,7 @@ public sealed class MemorySettings : ISettingsService
     public bool ShowHiddenFiles { get; set; }
     public bool ConfirmDelete { get; set; } = true;
     public SortMode Sort { get; set; }
+    public bool ShowThumbnails { get; set; } = true;
 }
 
 /// <summary>
@@ -220,5 +221,40 @@ public sealed class StubHttpHandler(Func<HttpRequestMessage, HttpResponseMessage
     {
         Requests.Add(request.RequestUri);
         return Task.FromResult(respond(request));
+    }
+}
+
+/// <summary>
+/// Hace "miniaturas" de tres bytes y apunta de que fichero. Se puede hacer fallar, lanzar o esperar a
+/// una senal (para ver la cola y la cancelacion).
+/// </summary>
+public sealed class FakeThumbnailGenerator : IThumbnailGenerator
+{
+    private readonly List<string> _made = new();
+
+    public bool Result { get; set; } = true;
+    public bool WriteNothing { get; set; }
+    public Exception? Error { get; set; }
+    public ManualResetEventSlim? Gate { get; set; }
+    public int Started;
+
+    public IReadOnlyList<string> Made
+    {
+        get { lock (_made) return _made.ToList(); }
+    }
+
+    public bool TryCreate(string sourcePath, bool isVideo, string targetPath, int sizePx, CancellationToken cancellationToken)
+    {
+        Interlocked.Increment(ref Started);
+        Gate?.Wait(cancellationToken);
+        lock (_made)
+            _made.Add(Path.GetFileName(sourcePath) + (isVideo ? ":video" : ":image") + ":" + sizePx);
+        if (Error is { } e)
+            throw e;
+        if (!Result)
+            return false;
+        if (!WriteNothing)
+            File.WriteAllBytes(targetPath, new byte[] { 1, 2, 3 });
+        return true;
     }
 }

@@ -42,6 +42,7 @@ public sealed class SettingsViewModelTests : CultureSafeTests
 
         Assert.True(_vm.ShowHiddenFiles);
         Assert.False(_vm.ConfirmDelete);
+        Assert.True(_vm.ShowThumbnails);
         Assert.False(_vm.IsSpanish);
     }
 
@@ -51,14 +52,18 @@ public sealed class SettingsViewModelTests : CultureSafeTests
         _vm.Loading = true;
         _vm.SetShowHiddenFiles(true);
         _vm.SetConfirmDelete(false);
+        _vm.SetShowThumbnails(false);
         Assert.False(Settings.ShowHiddenFiles);
         Assert.True(Settings.ConfirmDelete);
+        Assert.True(Settings.ShowThumbnails);
 
         _vm.Loading = false;
         _vm.SetShowHiddenFiles(true);
         _vm.SetConfirmDelete(false);
+        _vm.SetShowThumbnails(false);
         Assert.True(Settings.ShowHiddenFiles);
         Assert.False(Settings.ConfirmDelete);
+        Assert.False(Settings.ShowThumbnails);
     }
 
     [Fact]

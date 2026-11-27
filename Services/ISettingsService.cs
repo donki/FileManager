@@ -14,5 +14,8 @@ public interface ISettingsService
 
     bool ConfirmDelete { get; set; }
 
+    /// <summary>Fotos y videos con su miniatura en la lista en vez del icono (activado por defecto).</summary>
+    bool ShowThumbnails { get; set; }
+
     SortMode Sort { get; set; }
 }

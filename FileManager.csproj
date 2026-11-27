@@ -16,8 +16,8 @@
     <ApplicationId>com.socratic.filemanager</ApplicationId>
 
     <!-- Versions (constitucion 6: ambos valores en sincronia) -->
-    <ApplicationDisplayVersion>2026.11.24.1</ApplicationDisplayVersion>
-    <ApplicationVersion>2026112401</ApplicationVersion>
+    <ApplicationDisplayVersion>2026.11.27.0</ApplicationDisplayVersion>
+    <ApplicationVersion>2026112700</ApplicationVersion>
 
     <!-- Accept Android SDK Licenses -->
     <AcceptAndroidSDKLicenses>true</AcceptAndroidSDKLicenses>
